@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "vcutils.h"
 
@@ -37,7 +38,7 @@ int main(){
      * Input may consist many lines, with one phrase on each line. An EOF signal shall be sent when input ends.
      * Output format:
      * Output consists many lines, with one hash on each line. Each hash is represented by a base 10 integer.
-     * The number of lines in the output is 16 times of that of input. An EOF signal wil be sent when output ends. */
+     * The number of lines in the output is 16 times of that of input. An EOF signal will be sent when output ends. */
     unsigned char *phrase;
     size_t size_phrase = 0;
     ssize_t len_phrase;
@@ -65,6 +66,8 @@ int main(){
             printf("%lu\n", sbph_r[i]);
         }
     }
+
+    free(phrase);
 
     return 0;
 }
