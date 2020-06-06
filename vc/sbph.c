@@ -53,10 +53,10 @@ int main(){
                 break;
             }
         }
-        hash_r[1] = hash_r[0];
-        hash_r[2] = hash_r[1];
-        hash_r[3] = hash_r[2];
         hash_r[4] = hash_r[3];
+        hash_r[3] = hash_r[2];
+        hash_r[2] = hash_r[1];
+        hash_r[1] = hash_r[0];
 
         hash_r[0] = str_hash(phrase, (size_t)(len_phrase));
 
