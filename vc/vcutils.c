@@ -11,7 +11,8 @@ unsigned long str_hash(unsigned char *str_to_hash, size_t len_str){
     unsigned long hash_result = 0;
 
     for (size_t i = 0; i < len_str; i++){
-        hash_result += (hash_result << 16);
+        /* Note: (2 ^ 16 + 1) was picked simply because it is a prime, with no other reasons. */
+        hash_result += (hash_result << 16);  /* hash_result *= (2 ^ 16 + 1) */
         hash_result += (unsigned long)(str_to_hash[i]);
         /* Auto truncate for unsign types, no modulo needed. */
     }

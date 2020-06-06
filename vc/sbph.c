@@ -13,12 +13,13 @@ void sbp_hash(unsigned long *sbph_result, unsigned long *hash){
      * sbph_result will be filled by 16 unsigned long integers as results. For each integer,
      * only the lower 32 bits are significant and other bits are set to 0. */
     unsigned long coef, mask;
+
     for (unsigned int i = 0; i < 16; i++){
         sbph_result[i] = 2 * hash[0];
 
         for (unsigned int j = 1; j < 5; j++){
             coef = (1 << j) + 1;
-            mask = (i >> (j - 1)) - ((i >> j) << 1);
+            mask = (i >> (j - 1)) - ((i >> j) << 1);  /* Extract the (j - 1) -th bit of i */
             sbph_result[i] += mask * coef * hash[j];
         }
 
@@ -47,6 +48,7 @@ int main(){
 
     while ((len_phrase = getline((char **)(&phrase), &size_phrase, stdin)) != -1){
         while ((phrase[len_phrase - 1] == '\r') || (phrase[len_phrase - 1] == '\n')){
+            /* Remove trailing line end chars. */
             if (len_phrase > 1){
                 len_phrase--;
             }
@@ -54,14 +56,15 @@ int main(){
                 break;
             }
         }
+
         hash_r[4] = hash_r[3];
         hash_r[3] = hash_r[2];
         hash_r[2] = hash_r[1];
         hash_r[1] = hash_r[0];
 
         hash_r[0] = str_hash(phrase, (size_t)(len_phrase));
-
         sbp_hash(sbph_r, hash_r);
+
         for (unsigned int i = 0; i < 16; i++){
             printf("%lu\n", sbph_r[i]);
         }
