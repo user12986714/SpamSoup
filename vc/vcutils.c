@@ -1,6 +1,6 @@
 #include "vcutils.h"
 
-void strip_endl(unsigned char *str_to_strip, size_t *len_str){
+void strip_endl(unsigned char *str_to_strip, ssize_t *len_str){
     /* This function strips trailing line end chars.
      * Arguments:
      * str_to_strip shall be an array of char elements to be stripped;
