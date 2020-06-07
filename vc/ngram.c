@@ -4,6 +4,12 @@
 
 #include "vcutils.h"
 
+/* !!!!! Warning !!!!!
+ * Please don't change the following constant unless absolutely necessary.
+ * If ever changed, all documentation need to be changed correspondingly,
+ * and all training effort will be destroyed. */
+#define PHRASE_PER_GROUP 5
+
 int main(){
     /* This program implements ngram, a hashing algorithm converting a list of phrase to
      * a list of 32 bits integer hashes, with each hash determined by the corresponding phrase
@@ -19,8 +25,8 @@ int main(){
     size_t size_phrase = 0;
     ssize_t len_phrase;
 
-    unsigned char *phrase_list[5] = {NULL};
-    size_t len_phrase_list[5] = {0};
+    unsigned char *phrase_list[PHRASE_PER_GROUP] = {NULL};
+    size_t len_phrase_list[PHRASE_PER_GROUP] = {0};
 
     unsigned char *catphrase;
     size_t len_catphrase;
@@ -33,25 +39,25 @@ int main(){
         strip_endl(phrase, &len_phrase);
 
         free(phrase_list[0]);
-        for (unsigned int i = 0; i < 4; i++){
+        for (unsigned int i = 0; i < PHRASE_PER_GROUP - 1; i++){
             len_phrase_list[i] = len_phrase_list[i + 1];
             phrase_list[i] = phrase_list[i + 1];
         }
 
-        len_phrase_list[4] = len_phrase;
-        phrase_list[4] = malloc((len_phrase + 1) * sizeof(char));
-        memcpy(phrase_list[4], phrase, len_phrase * sizeof(char));
-        phrase_list[4][len_phrase] = '\0';
+        len_phrase_list[PHRASE_PER_GROUP - 1] = len_phrase;
+        phrase_list[PHRASE_PER_GROUP - 1] = malloc((len_phrase + 1) * sizeof(char));
+        memcpy(phrase_list[PHRASE_PER_GROUP - 1], phrase, len_phrase * sizeof(char));
+        phrase_list[PHRASE_PER_GROUP - 1][len_phrase] = '\0';
 
         if (phrase_list[0] && len_phrase_list[0]){  /* Double insurance. */
             len_catphrase = 0;
-            for (unsigned int i = 0; i < 5; i++){
+            for (unsigned int i = 0; i < PHRASE_PER_GROUP; i++){
                 len_catphrase += len_phrase_list[i] + 1;
             }
             catphrase = malloc(len_catphrase-- * sizeof(char));
 
             ptr = 0;
-            for (unsigned int i = 0; i < 5; i++){
+            for (unsigned int i = 0; i < PHRASE_PER_GROUP; i++){
                 memcpy(catphrase + ptr * sizeof(char), phrase_list[i], len_phrase_list[i]);
                 ptr += len_phrase_list[i];
                 catphrase[ptr++] = '\0';
@@ -67,20 +73,22 @@ int main(){
     if (!phrase_list[0]){
         while (!phrase_list[not_null_phrase]){
             not_null_phrase++;
-            if (not_null_phrase > 4){
+            if (not_null_phrase == PHRASE_PER_GROUP){
+                /* Since not_null_phrase is increased one by a time, this is equal to
+                 * if (not_null_phrase >= PHRASE_PER_GROUP) */
                 break;
             }
         }
 
-        if (not_null_phrase < 5){
+        if (not_null_phrase < PHRASE_PER_GROUP){
             len_catphrase = 0;
-            for (unsigned i = not_null_phrase; i < 5; i++){
+            for (unsigned i = not_null_phrase; i < PHRASE_PER_GROUP; i++){
                 len_catphrase += len_phrase_list[i] + 1;
             }
             catphrase = malloc(len_catphrase-- * sizeof(char));
 
             ptr = 0;
-            for (unsigned int i = not_null_phrase; i < 5; i++){
+            for (unsigned int i = not_null_phrase; i < PHRASE_PER_GROUP; i++){
                 memcpy(catphrase + ptr * sizeof(char), phrase_list[i], len_phrase_list[i]);
                 ptr += len_phrase_list[i];
                 catphrase[ptr++] = '\0';
@@ -93,7 +101,7 @@ int main(){
         }
     }
 
-    for (unsigned int i = 0; i < 5; i++){
+    for (unsigned int i = 0; i < PHRASE_PER_GROUP; i++){
         free(phrase_list[i]);
     }
     free(phrase);
