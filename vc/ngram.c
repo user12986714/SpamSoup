@@ -25,7 +25,7 @@ int main(){
     unsigned char *catphrase;
     size_t len_catphrase;
     size_t ptr;
-    unsigned int not_null_phrase = 4;
+    unsigned int not_null_phrase = 0;
 
     unsigned long hash;
 
@@ -66,13 +66,13 @@ int main(){
 
     if (!phrase_list[0]){
         while (!phrase_list[not_null_phrase]){
-            not_null_phrase--;
-            if (not_null_phrase < 0){
+            not_null_phrase++;
+            if (not_null_phrase > 4){
                 break;
             }
         }
 
-        if (++not_null_phrase > 0){
+        if (not_null_phrase < 5){
             len_catphrase = 0;
             for (unsigned i = 0; i < not_null_phrase; i++){
                 len_catphrase += len_phrase_list[i] + 1;
