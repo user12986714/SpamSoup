@@ -47,15 +47,7 @@ int main(){
     unsigned long sbph_r[16];
 
     while ((len_phrase = getline((char **)(&phrase), &size_phrase, stdin)) != -1){
-        while ((phrase[len_phrase - 1] == '\r') || (phrase[len_phrase - 1] == '\n')){
-            /* Remove trailing line end chars. */
-            if (len_phrase > 1){
-                len_phrase--;
-            }
-            else{
-                break;
-            }
-        }
+        strip_endl(phrase, &len_phrase);
 
         hash_r[4] = hash_r[3];
         hash_r[3] = hash_r[2];
