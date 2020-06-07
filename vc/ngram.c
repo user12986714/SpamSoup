@@ -74,12 +74,12 @@ int main(){
 
         if (not_null_phrase < 5){
             len_catphrase = 0;
-            for (unsigned i = 0; i < not_null_phrase; i++){
+            for (unsigned i = not_null_phrase; i < 5; i++){
                 len_catphrase += len_phrase_list[i] + 1;
             }
             catphrase = malloc(len_catphrase-- * sizeof(char));
 
-            for (unsigned int i = 0; i < not_null_phrase; i++){
+            for (unsigned int i = not_null_phrase; i < 5; i++){
                 memcpy(catphrase + ptr * sizeof(char), phrase_list[i], len_phrase_list[i]);
                 ptr += len_phrase_list[i];
                 catphrase[ptr++] = '\0';
