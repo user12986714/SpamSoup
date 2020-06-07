@@ -24,7 +24,7 @@ int main(){
 
     unsigned char *catphrase;
     size_t len_catphrase;
-    size_t ptr;
+    size_t ptr;  /* Pointer used when concatenating phrases. */
     unsigned int not_null_phrase = 0;
 
     unsigned long hash;
@@ -44,13 +44,13 @@ int main(){
         phrase_list[4][len_phrase] = '\0';
 
         if (phrase_list[0] && len_phrase_list[0]){  /* Double insurance. */
-            ptr = 0;
             len_catphrase = 0;
             for (unsigned int i = 0; i < 5; i++){
                 len_catphrase += len_phrase_list[i] + 1;
             }
             catphrase = malloc(len_catphrase-- * sizeof(char));
 
+            ptr = 0;
             for (unsigned int i = 0; i < 5; i++){
                 memcpy(catphrase + ptr * sizeof(char), phrase_list[i], len_phrase_list[i]);
                 ptr += len_phrase_list[i];
@@ -79,6 +79,7 @@ int main(){
             }
             catphrase = malloc(len_catphrase-- * sizeof(char));
 
+            ptr = 0;
             for (unsigned int i = not_null_phrase; i < 5; i++){
                 memcpy(catphrase + ptr * sizeof(char), phrase_list[i], len_phrase_list[i]);
                 ptr += len_phrase_list[i];

@@ -4,10 +4,10 @@ void strip_endl(unsigned char *str_to_strip, ssize_t *len_str){
     /* This function strips trailing line end chars.
      * Arguments:
      * str_to_strip shall be an array of char elements to be stripped;
-     * len_str shall be a size_t variable with value equal to number of elements in str_to_strip.
+     * len_str shall be a pointer to a size_t variable with value equal to number of elements in str_to_strip.
      * Outcome:
-     * len_str will be modyfied to the value equal to number of elements in stripped str_to_strip.
-     * Note that str_to_strip will not change by calling this function. */
+     * (*len_str) will be modyfied to the value equal to number of elements in stripped str_to_strip.
+     * Note that str_to_strip will not change. */
     while ((str_to_strip[*len_str - 1] == '\r') || (str_to_strip[*len_str - 1] == '\n')){
         /* Operator *, -- and ! are of the same precedence, but at that level of precedence
          * the associativity is right-to-left. */
