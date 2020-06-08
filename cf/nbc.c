@@ -62,7 +62,7 @@ char bayes_classify(FILE *data_file){
     long double p_hash_given_tp, p_hash_given_fp;
     long double p_w_hash_given_tp, p_w_hash_given_fp;
 
-    long double prior = PRIOR_BAIS, posterior;
+    long double prior = PRIOR_BAIS;
 
     while (scanf("%lu", &hash) != -1){
         offset = 2 * BYTES_PER_RECORD * (long)(hash % FOLD_TO);
