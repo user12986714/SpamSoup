@@ -82,14 +82,12 @@ char bayes_classify(FILE *data_file){
             p_w_hash_given_tp = (p_hash_given_tp - (long double)(0.5)) * weight + (long double)(0.5);
             p_w_hash_given_fp = (p_hash_given_fp - (long double)(0.5)) * weight + (long double)(0.5);
 
-            /* Bayes theorem */
-            posterior = p_w_hash_given_tp * prior / (p_w_hash_given_tp * prior + p_w_hash_given_fp * ((long double)(1) - prior));
-            prior = posterior;
+            /* Bayes theorem. This gives new prior. */
+            prior = p_w_hash_given_tp * prior / (p_w_hash_given_tp * prior + p_w_hash_given_fp * ((long double)(1) - prior));
         }
         /* Else there is no data yet. Skip. */
     }
 
-    /* Use prior because if all are skiped (posterior == NaN), otherwise (prior == posterior) anyway. */
     if (prior > (long double)(0.5)){
         return 'T';
     }
@@ -113,22 +111,20 @@ int main(int argc, char *argv[]){
      * Two arguments shall be passed via command line.
      * The first shall be either "--learn" or "--classify".
      * If "--learn" is passed, it shall be either "--learn=T" or "--learn=F". "--learn=T" instructs
-     * this program to learn the group of hash as a true postive, and "--learn=F" instructs this
-     * program to learn the group of hash as a false positive. In both case, the output will be
-     * the same as what this program is instructed to learn. "--classfy" instruct this program to
-     * classify the group of hash as either true positive or false positive. The output will be
-     * what this program classifies the group of hash.
+     * this program to learn the group of hashes as a true postive, and "--learn=F" instructs this
+     * program to learn the group of hashes as a false positive. In both case, the output will be
+     * the same as what this program is instructed to learn. "--classify" instructs this program to
+     * classify the group of hashes as either true positive or false positive. The output will be
+     * what this program classifies the group of hashes.
      * The second shall be "--data".
      * "--data" shall be in the format "--data=/path/to/data/file", where "/path/to/data/file" is
      * the path, absolute or relative, to a valid data file this program uses to store learning
      * result. This arguments instruct this program what data file to use for learning and classfying. */
-    int learn_mode;
     char category;
     FILE *data_file;
 
-    learn_mode = (starts_with("--learn", argv[1])) ? 1 : 0;
     /* Following magic numbers are from program specifiation. */
-    if (learn_mode){
+    if (starts_with("--learn", argv[1])){
         category = argv[1][8];
         data_file = fopen(&(argv[2][7]), "r+b");
         bayes_learn(data_file, category);

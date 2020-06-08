@@ -1,5 +1,6 @@
-#include "cfutils.h"
 #include <string.h>
+
+#include "cfutils.h"
 
 int starts_with(char *pattern, char *target){
     /* This function decides whether char array target starts with char array pattern.
