@@ -27,7 +27,7 @@ void sbp_hash(unsigned long *sbph_result, unsigned long *hash){
 
         for (unsigned int j = 1; j < PHRASE_PER_GROUP; j++){
             coef = (1 << j) + 1;
-            mask = (i >> (j - 1)) - ((i >> j) << 1);  /* Extract the (j - 1) -th bit of i */
+            mask = i & (1 << (j - 1));
             sbph_result[i] += mask * coef * hash[j];
         }
 
