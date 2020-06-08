@@ -76,8 +76,8 @@ char bayes_classify(FILE *data_file){
             weight = logistic(total_count);
 
             /* Seperate calculation needed as floating point accuracy might not be enough. */
-            p_hash_given_tp = (long double)(tp_count) / total_count;
-            p_hash_given_fp = (long double)(fp_count) / total_count;
+            p_hash_given_tp = (long double)(tp_count) / (long double)(total_count);
+            p_hash_given_fp = (long double)(fp_count) / (long double)(total_count);
 
             p_w_hash_given_tp = (p_hash_given_tp - (long double)(0.5)) * weight + (long double)(0.5);
             p_w_hash_given_fp = (p_hash_given_fp - (long double)(0.5)) * weight + (long double)(0.5);
