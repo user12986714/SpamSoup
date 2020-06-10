@@ -108,6 +108,9 @@ def ms_ws_listener():
                 # Fetch post to be learned.
                 post_tuple = get_post(post_id)
                 learn_post(post_tuple, is_over_thres)
+        except RuntimeError:
+            # Severe errors
+            raise
         except KeyboardInterrupt:
             # User decides to exit.
             ws.close()
