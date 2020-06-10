@@ -15,7 +15,7 @@ def get_feedback_on_post(post_id):
     # Returns: A list of tuples with each in format (uid, feedback).
 
     route = Config.ms_host + '/api/v2.0/feedbacks/post/' +\
-            '{}?key={}&filter=JJLFGJOFIOMFLGHJLHNIFMGJILKJKHOLMHIFGGOLFNIHF'
+                             '{}?key={}&filter=JJLFGJOFIOMFLGHJLHNIFMGJILKJKHOLMHIFGGOLFNIHF'
     response = requests.get(route.format(post_id, Config.ms_key))
     data = response.json()
 
@@ -32,7 +32,7 @@ def get_post(post_id):
     # Returns: A tuple (post_title, post_body, (user_site, user_id, user_name))
 
     route = Config.ms_host + '/api/v2.0/posts/' +\
-            '{}?key={}&filter=MLLKIHJMHIHKKFMJLLHGMKIMMGOKFFN'
+                             '{}?key={}&filter=MLLKIHJMHIHKKFMJLLHGMKIMMGOKFFN'
     response = requests.get(route.format(post_id, Config.ms_key))
     data = response.json()
 
@@ -195,15 +195,15 @@ def analyze_post(post_tuple):
     tokenized_post_str = "\n".join(tokenized_post) + "\n"
     tokenized_post_bytes = tokenized_post_str.encode("utf-8")
 
-    sbph = subprocess.Popen(["vc/sbph"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ngram = subprocess.Popen(["vc/ngram"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    bow = subprocess.Popen(["vc/bow"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    sbph = subprocess.Popen([Config.sbph_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ngram = subprocess.Popen([Config.ngram_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    bow = subprocess.Popen([Config.bow_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    sbph_nbc = subprocess.Popen(["cf/nbc", "--classify", "--data=dat/nbc/sbph.dat"],
+    sbph_nbc = subprocess.Popen([Config.nbc_bin_loc, "--classify", "--data=" + Config.sbph_nbc_dat_loc],
                                 stdin=sbph.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ngram_nbc = subprocess.Popen(["cf/nbc", "--classify", "--data=dat/nbc/ngram.dat"],
+    ngram_nbc = subprocess.Popen([Config.nbc_bin_loc, "--classify", "--data=" + Config.ngram_nbc_dat_loc],
                                  stdin=ngram.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    bow_nbc = subprocess.Popen(["cf/nbc", "--classify", "--data=dat/nbc/bow.dat"],
+    bow_nbc = subprocess.Popen([Config.nbc_bin_loc, "--classify", "--data=" + Config.bow_nbc_dat_loc],
                                stdin=bow.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # Start
@@ -231,15 +231,15 @@ def learn_post(post_tuple, is_tp):
     tokenized_post_str = "\n".join(tokenized_post) + "\n"
     tokenized_post_bytes = tokenized_post_str.encode("utf-8")
 
-    sbph = subprocess.Popen(["vc/sbph"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ngram = subprocess.Popen(["vc/ngram"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    bow = subprocess.Popen(["vc/bow"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    sbph = subprocess.Popen([Config.sbph_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ngram = subprocess.Popen([Config.ngram_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    bow = subprocess.Popen([Config.bow_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    sbph_nbc = subprocess.Popen(["cf/nbc", learn_arg_str, "--data=dat/nbc/sbph.dat"],
+    sbph_nbc = subprocess.Popen([Config.nbc_bin_loc, learn_arg_str, "--data=" + Config.sbph_nbc_dat_loc],
                                 stdin=sbph.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ngram_nbc = subprocess.Popen(["cf/nbc", learn_arg_str, "--data=dat/nbc/ngram.dat"],
+    ngram_nbc = subprocess.Popen([Config.nbc_bin_loc, learn_arg_str, "--data=" + Config.ngram_nbc_dat_loc],
                                  stdin=ngram.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    bow_nbc = subprocess.Popen(["cf/nbc", learn_arg_str, "--data=dat/nbc/bow.dat"],
+    bow_nbc = subprocess.Popen([Config.nbc_bin_loc, learn_arg_str, "--data=" + Config.bow_nbc_dat_loc],
                                stdin=bow.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # Start
