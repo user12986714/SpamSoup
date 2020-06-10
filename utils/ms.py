@@ -14,7 +14,7 @@ def get_feedback_on_post(post_id):
     """ Get the list of feedback on post. """
     # Returns: A list of tuples with each in format (uid, feedback).
 
-    route = 'https://metasmoke.erwaysoftware.com/api/v2.0/feedbacks/post/' +\
+    route = Config.ms_host + '/api/v2.0/feedbacks/post/' +\
             '{}?key={}&filter=JJLFGJOFIOMFLGHJLHNIFMGJILKJKHOLMHIFGGOLFNIHF'
     response = requests.get(route.format(post_id, Config.ms_key))
     data = response.json()
@@ -31,7 +31,7 @@ def get_post(post_id):
     """ Get the post. """
     # Returns: A tuple (post_title, post_body, (user_site, user_id, user_name))
 
-    route = 'https://metasmoke.erwaysoftware.com/api/v2.0/posts/' +\
+    route = Config.ms_host + '/api/v2.0/posts/' +\
             '{}?key={}&filter=MLLKIHJMHIHKKFMJLLHGMKIMMGOKFFN'
     response = requests.get(route.format(post_id, Config.ms_key))
     data = response.json()
