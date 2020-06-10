@@ -79,11 +79,16 @@ def ms_ws_listener():
         try:
             resp = ws.recv()
             data = json.loads(resp)
+
+            if "type" in data:
+                if data["type"] == "reject_subscription":
+                    raise RuntimeError("MS WS connection rejected.")
+                if data["type"] == "ping":
+                    continue
+
             if "message" not in data:
-                if "type" in data:
-                    if data["type"] == "reject_subscription":
-                        raise RuntimeError("MS WS connection rejected.")
                 continue
+
             msg = data["message"]
             if msg["event_class"] == "Post":
                 # New post created. Analyze it.
