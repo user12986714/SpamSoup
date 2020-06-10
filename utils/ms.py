@@ -37,7 +37,7 @@ def get_post(post_id):
     data = response.json()
 
     user_link = data["items"][0]["user_link"]
-    user_re = re.search(r'^https?:\/\/([a-z.]++)\/users\/([0-9]++)', user_link)
+    user_re = re.search(r'^https?:\/\/([a-z.]+)\/users\/([0-9]+)', user_link)
 
     user = (user_re.group(0), user_re.group(1),
             data["items"][0]["username"])
@@ -88,7 +88,7 @@ def ms_ws_listener():
             if msg["event_class"] == "Post":
                 # New post created. Analyze it.
                 user_link = msg["object"]["user_link"]
-                user_re = re.search(r'^https?:\/\/([a-z.]++)\/users\/([0-9]++)', user_link)
+                user_re = re.search(r'^https?:\/\/([a-z.]+)\/users\/([0-9]+)', user_link)
 
                 user = (user_re.group(0), user_re.group(1),
                         msg["object"]["username"])
