@@ -17,9 +17,10 @@ def get_feedback_on_post(post_id):
     route = 'https://metasmoke.erwaysoftware.com/api/v2.0/feedbacks/post/' +\
             '{}?key={}&filter=JJLFGJOFIOMFLGHJLHNIFMGJILKJKHOLMHIFGGOLFNIHF'
     response = requests.get(route.format(post_id, Config.ms_key))
+    data = response.json()
 
     feedbacks = list()
-    for item in response["items"]:
+    for item in data["items"]:
         feedback = (item["user_name"], item["feedback_type"])
         feedbacks.append(feedback)
 
@@ -33,14 +34,15 @@ def get_post(post_id):
     route = 'https://metasmoke.erwaysoftware.com/api/v2.0/posts/' +\
             '{}?key={}&filter=MLLKIHJMHIHKKFMJLLHGMKIMMGOKFFN'
     response = requests.get(route.format(post_id, Config.ms_key))
+    data = response.json()
 
-    user_link = response["items"][0]["user_link"]
+    user_link = data["items"][0]["user_link"]
     user_re = re.search(r'^https?:\/\/([a-z.]++)\/users\/([0-9]++)', user_link)
 
     user = (user_re.group(0), user_re.group(1),
-            response["items"][0]["username"])
+            data["items"][0]["username"])
 
-    return (response["items"][0]["title"], response["items"][0]["body"], user)
+    return (data["items"][0]["title"], data["items"][0]["body"], user)
 
 
 def conn_ms_ws():
