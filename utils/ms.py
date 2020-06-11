@@ -214,9 +214,9 @@ def analyze_post(post_tuple):
     bow.stdin.write(tokenized_post_bytes)
     bow.stdin.close()
 
-    sbph_nbc_out = sbph_nbc.communicate()[0].decode("utf-8")
-    ngram_nbc_out = ngram_nbc.communicate()[0].decode("utf-8")
-    bow_nbc_out = bow_nbc.communicate()[0].decode("utf-8")
+    sbph_nbc_out = sbph_nbc.communicate()[0].decode("utf-8")[0]
+    ngram_nbc_out = ngram_nbc.communicate()[0].decode("utf-8")[0]
+    bow_nbc_out = bow_nbc.communicate()[0].decode("utf-8")[0]
 
     print("Classify post: NT-SBPH-NBC: {}; NT-Ngram-NBC: {}; NT-BoW-NBC: {}".format(sbph_nbc_out,
                                                                                     ngram_nbc_out,
@@ -250,9 +250,9 @@ def learn_post(post_tuple, is_tp):
     bow.stdin.write(tokenized_post_bytes)
     bow.stdin.close()
 
-    sbph_nbc_out = sbph_nbc.communicate()[0].decode("utf-8")
-    ngram_nbc_out = ngram_nbc.communicate()[0].decode("utf-8")
-    bow_nbc_out = bow_nbc.communicate()[0].decode("utf-8")
+    sbph_nbc_out = sbph_nbc.communicate()[0].decode("utf-8")[0]
+    ngram_nbc_out = ngram_nbc.communicate()[0].decode("utf-8")[0]
+    bow_nbc_out = bow_nbc.communicate()[0].decode("utf-8")[0]
 
     print("Learn post: NT-SBPH-NBC: {}; NT-Ngram-NBC: {}; NT-BoW-NBC: {}".format(sbph_nbc_out,
                                                                                  ngram_nbc_out,
