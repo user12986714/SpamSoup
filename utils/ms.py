@@ -51,7 +51,7 @@ def conn_ms_ws():
         ws = websocket.create_connection(Config.ms_ws_host, origin=Config.ms_host)
         idf = r'{"channel": "ApiChannel",' +\
               r'"key": "{}",'.format(Config.ms_key) +\
-              r'"events": "feedbacks#update;posts#create"}'
+              r'"events": "feedbacks#create;posts#create"}'
         payload = json.dumps({"command": "subscribe", "identifier": idf})
         ws.send(payload)
         ws.settimeout(10)
