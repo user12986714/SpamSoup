@@ -171,8 +171,8 @@ def naive_tokenizer(post_tuple):
     # Argument: the tuple returned by get_post() or ms_ws_listener()
     # Returns: tokenized string list
 
-    tokenized_title = post_tuple[0].split(" ")
-    tokenized_body = post_tuple[1].split(" ")
+    tokenized_title = post_tuple[0].replace("\n", " ").split(" ")
+    tokenized_body = post_tuple[1].replace("\n", " ").split(" ")
     # Make unified_user_site_id unique from other potential tokens
     # by whitespace and other identifiable substrings
     # post[2] == (user_site, user_id, user_name)
@@ -195,7 +195,7 @@ def naive_tokenizer(post_tuple):
 def analyze_post(post_tuple):
     """ Call appropriate executables to analyze the post. """
     tokenized_post = naive_tokenizer(post_tuple)
-    tokenized_post_str = "\n".join(tokenized_post)  # No need trailing '\n' as all posts on MS already have it.
+    tokenized_post_str = "\n".join(tokenized_post) + "\n"
     tokenized_post_bytes = tokenized_post_str.encode("utf-8")
 
     sbph = subprocess.Popen([Config.sbph_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -231,7 +231,7 @@ def learn_post(post_tuple, is_tp):
     learn_arg_str = "--learn={}".format("T" if is_tp else "F")
 
     tokenized_post = naive_tokenizer(post_tuple)
-    tokenized_post_str = "\n".join(tokenized_post)  # No need trailing '\n' as all posts on MS already have it.
+    tokenized_post_str = "\n".join(tokenized_post) + "\n"
     tokenized_post_bytes = tokenized_post_str.encode("utf-8")
 
     sbph = subprocess.Popen([Config.sbph_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
