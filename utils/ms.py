@@ -42,7 +42,7 @@ def get_post(post_id):
     user_link = data["items"][0]["user_link"]
     user_re = re.search(r'^(?:https?:)?\/\/([a-z.]+)\/users\/([0-9]+)', user_link)
 
-    user = (user_re.group(0), user_re.group(1),
+    user = (user_re.group(1), user_re.group(2),
             data["items"][0]["username"])
 
     return (data["items"][0]["title"], data["items"][0]["body"], user)
@@ -98,7 +98,7 @@ def ms_ws_listener():
                 user_link = msg["object"]["user_link"]
                 user_re = re.search(r'^(?:https?:)?\/\/([a-z.]+)\/users\/([0-9]+)', user_link)
 
-                user = (user_re.group(0), user_re.group(1),
+                user = (user_re.group(1), user_re.group(2),
                         msg["object"]["username"])
 
                 post_tuple = (msg["object"]["title"], msg["object"]["body"], user)
