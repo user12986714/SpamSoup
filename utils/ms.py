@@ -4,6 +4,7 @@
 """ Communicates with ms and calls appropriate executables. """
 import re
 import json
+import time
 import subprocess
 import requests
 import websocket
@@ -13,6 +14,8 @@ from config import Config
 def get_feedback_on_post(post_id):
     """ Get the list of feedback on post. """
     # Returns: A list of tuples with each in format (uid, feedback).
+
+    time.sleep(1)  # This is needed due to an issue in MS API. Remove this line if solved.
 
     route = Config.ms_host + '/api/v2.0/feedbacks/post/' +\
                              '{}?key={}&filter=JJLFGJOFIOMFLGHJLHNIFMGJILKJKHOLMHIFGGOLFNIHF'
