@@ -182,8 +182,8 @@ def naive_tokenizer(post_tuple):
     # Use SBPH wisely. The first token will be multiplied by 16,
     # the second by 8, the third by 4, and fourth by 2.
     # Hence the first token acts like uid black/white list
-    tokenized_post.extend(unified_user_site_id)
-    tokenized_post.extend(post_tuple[2][2])  # This is the username
+    tokenized_post.append(unified_user_site_id)
+    tokenized_post.append(post_tuple[2][2])  # This is the username
     tokenized_post.extend(tokenized_title)
     tokenized_post.extend(tokenized_body)
 
