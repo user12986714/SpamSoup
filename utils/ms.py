@@ -187,7 +187,7 @@ def naive_tokenizer(post_tuple):
     tokenized_post.extend(tokenized_title)
     tokenized_post.extend(tokenized_body)
 
-    return tokenized_post
+    return [x for x in tokenized_post if x]
 
 
 # Ad hoc code ahead.
