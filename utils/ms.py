@@ -195,7 +195,7 @@ def naive_tokenizer(post_tuple):
 def analyze_post(post_tuple):
     """ Call appropriate executables to analyze the post. """
     tokenized_post = naive_tokenizer(post_tuple)
-    tokenized_post_str = "\n".join(tokenized_post) + "\n"
+    tokenized_post_str = "\n".join(tokenized_post)  # No need trailing '\n' as all posts on MS already have it.
     tokenized_post_bytes = tokenized_post_str.encode("utf-8")
 
     sbph = subprocess.Popen([Config.sbph_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -231,7 +231,7 @@ def learn_post(post_tuple, is_tp):
     learn_arg_str = "--learn={}".format("T" if is_tp else "F")
 
     tokenized_post = naive_tokenizer(post_tuple)
-    tokenized_post_str = "\n".join(tokenized_post) + "\n"
+    tokenized_post_str = "\n".join(tokenized_post)  # No need trailing '\n' as all posts on MS already have it.
     tokenized_post_bytes = tokenized_post_str.encode("utf-8")
 
     sbph = subprocess.Popen([Config.sbph_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
