@@ -85,9 +85,20 @@ char bayes_classify(FILE *data_file){
     long double sample_bias;
 
     offset = 2 * BYTES_PER_RECORD * (long)(FOLD_TO);
+
     fseek(data_file, offset, SEEK_SET);
     fread(&total_tp, 8, 1, data_file);
     fread(&total_fp, 8, 1, data_file);
+
+    if (!total_tp && !total_fp){
+        if (PRIOR_BIAS > 0.5){
+                return 'T';
+        }
+        /* Do note that this also includes PRIOR_BIAS == 0 case,
+         * which means to set prior bias the same as sample bias. */
+        return 'F';  /* Default to fp if no post is learned. */
+    }
+
     sample_bias = (long double)(total_tp) / ((long double)(total_tp) + (long double)(total_fp));
     posterior = PRIOR_BIAS ? PRIOR_BIAS : sample_bias;
 
@@ -109,7 +120,7 @@ char bayes_classify(FILE *data_file){
     }
 
     if (PRIOR_BIAS){
-        fprintf(stderr, "Confidence: %Lf @@ %Lf && %Lf", posterior, sample_bias, PRIOR_BIAS);
+        fprintf(stderr, "Confidence: %Lf @@ %Lf && %Lf", posterior, sample_bias, (long double)(PRIOR_BIAS));
     }
     else{
         fprintf(stderr, "Confidence: %Lf @@ %Lf", posterior, sample_bias);
