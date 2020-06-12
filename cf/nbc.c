@@ -13,7 +13,7 @@
  * Bugs guaranteed for failures in following this advice. */
 #define BYTES_PER_RECORD 4
 
-#define PRIOR_BAIS 0.5
+#define PRIOR_BAIS 0
 
 void bayes_learn(FILE *data_file, char category){
     /* This function increases the counter, corresponding to the category, of hashes
@@ -25,21 +25,37 @@ void bayes_learn(FILE *data_file, char category){
      * The corresponding counter will be increased. */
     unsigned long hash;
     long offset;
-    uint32_t counter, new_counter;
+    uint32_t hash_counter;
+    uint64_t posts_counter;
 
     while (scanf("%lu", &hash) != -1){
         offset = 2 * BYTES_PER_RECORD * (long)(hash % FOLD_TO);
-        offset += (category == 'T') ? 0 : (BYTES_PER_RECORD);
+        offset += (category == 'T') ? 0 : BYTES_PER_RECORD;
 
         fseek(data_file, offset, SEEK_SET);
-        fread(&counter, BYTES_PER_RECORD, 1, data_file);
+        fread(&hash_counter, BYTES_PER_RECORD, 1, data_file);
 
-        new_counter = counter + 1;
-        if (new_counter){
-            fseek(data_file, offset, SEEK_SET);  /* Go back. */
-            fwrite(&new_counter, BYTES_PER_RECORD, 1, data_file);
+        hash_counter += 1;
+        if (hash_counter){
+            fseek(data_file, offset, SEEK_SET);
+            fwrite(&hash_counter, BYTES_PER_RECORD, 1, data_file);
         }
-        /* Else the original counter is already at maximum. Skip. */
+        else{
+            fprintf(stderr, "Hash %lu as %c overflowed.\n", hash, category);
+        }
+    }
+
+    offset = 2 * BYTES_PER_RECORD * (long)(FOLD_TO);
+    offset += (category == 'T') ? 0 : BYTES_PER_RECORD;
+    fseek(data_file, offset, SEEK_SET);
+    fread(&posts_counter, 8, 1, data_file);
+    posts_counter += 1;
+    if (posts_counter){
+        fseek(data_file, offset, SEEK_SET);
+        fwrite(&posts_counter, 8, 1, data_file);
+    }
+    else{
+        fprintf(stderr, "Total %c posts overflowed.\n", category);
     }
     return;
 }
@@ -59,10 +75,19 @@ char bayes_classify(FILE *data_file){
     unsigned long long total_count;
 
     long double weight;
-    long double p_hash_given_tp, p_hash_given_fp;
-    long double p_w_hash_given_tp, p_w_hash_given_fp;
+    long double p_tp, p_w_tp;
 
-    long double prior = PRIOR_BAIS;
+    long double posterior;
+
+    uint64_t total_tp, total_fp;
+    long double sample_bais;
+
+    offset = 2 * BYTES_PER_RECORD * (long)(FOLD_TO);
+    fseek(data_file, offset, SEEK_SET);
+    fread(&total_tp, 8, 1, data_file);
+    fread(&total_fp, 8, 1, data_file);
+    sample_bais = (long double)(total_tp) / ((long double)(total_tp) + (long double)(total_fp));
+    posterior = PRIOR_BAIS ? PRIOR_BAIS : sample_bais;
 
     while (scanf("%lu", &hash) != -1){
         offset = 2 * BYTES_PER_RECORD * (long)(hash % FOLD_TO);
@@ -74,21 +99,21 @@ char bayes_classify(FILE *data_file){
         total_count = (unsigned long long)(tp_count) + (unsigned long long)(fp_count);
         if (total_count){
             weight = logistic(total_count);
-
-            /* Seperate calculation needed as floating point accuracy might not be enough. */
-            p_hash_given_tp = (long double)(tp_count) / (long double)(total_count);
-            p_hash_given_fp = (long double)(fp_count) / (long double)(total_count);
-
-            p_w_hash_given_tp = (p_hash_given_tp - (long double)(0.5)) * weight + (long double)(0.5);
-            p_w_hash_given_fp = (p_hash_given_fp - (long double)(0.5)) * weight + (long double)(0.5);
-
-            /* Bayes theorem. This gives new prior. */
-            prior = p_w_hash_given_tp * prior / (p_w_hash_given_tp * prior + p_w_hash_given_fp * ((long double)(1) - prior));
+            p_tp = (long double)(tp_count) / (long double)(total_count);
+            p_w_tp = (p_tp - sample_bais) * weight + sample_bais;
+            posterior = posterior * p_w_tp / sample_bais;
         }
         /* Else there is no data yet. Skip. */
     }
 
-    if (prior > (long double)(0.5)){
+    if (PRIOR_BAIS){
+        fprintf(stderr, "Confidence: %Lf @@ %Lf && %Lf", posterior, sample_bais, PRIOR_BAIS);
+    }
+    else{
+        fprintf(stderr, "Confidence: %Lf @@ %Lf", posterior, sample_bais);
+    }
+
+    if (posterior > (long double)(0.5)){
         return 'T';
     }
     else{
