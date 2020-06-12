@@ -35,7 +35,7 @@ void bayes_learn(FILE *data_file, char category){
         fseek(data_file, offset, SEEK_SET);
         fread(&hash_counter, BYTES_PER_RECORD, 1, data_file);
 
-        hash_counter += 1;
+        hash_counter++;
         if (hash_counter){
             fseek(data_file, offset, SEEK_SET);
             fwrite(&hash_counter, BYTES_PER_RECORD, 1, data_file);
@@ -47,9 +47,11 @@ void bayes_learn(FILE *data_file, char category){
 
     offset = 2 * BYTES_PER_RECORD * (long)(FOLD_TO);
     offset += (category == 'T') ? 0 : BYTES_PER_RECORD;
+
     fseek(data_file, offset, SEEK_SET);
     fread(&posts_counter, 8, 1, data_file);
-    posts_counter += 1;
+
+    posts_counter++;
     if (posts_counter){
         fseek(data_file, offset, SEEK_SET);
         fwrite(&posts_counter, 8, 1, data_file);
