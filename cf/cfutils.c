@@ -25,24 +25,3 @@ int starts_with(char *pattern, char *target){
 
     return 1;
 }
-
-long double logistic(unsigned long long x){
-    /* This function calculates the logistic of x.
-     * Arguments:
-     * x shall be a unsigned long long variable to be given logistic.
-     * Outcome:
-     * A long double value will return that is the logistic of x. */
-    long double power = (long double)(1) / LOGISTIC_COEF;
-    long double coef = 1;
-
-    /* Calculate (LOGISTIC_COEF ^ (-x)) */
-    while (x > 0){
-        if (x & 1){
-            coef *= power;
-        }
-        power *= power;
-        x >>= 1;
-    }
-
-    return ((long double)(1) / ((long double)(1) + coef));
-}
