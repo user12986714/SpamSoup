@@ -15,8 +15,6 @@ def get_feedback_on_post(post_id):
     """ Get the list of feedback on post. """
     # Returns: A list of tuples with each in format (uid, feedback).
 
-    time.sleep(1)  # This is needed due to an issue in MS API. Remove this line if solved.
-
     route = Config.ms_host + '/api/v2.0/feedbacks/post/' +\
                              '{}?key={}&filter=JJLFGJOFIOMFLGHJLHNIFMGJILKJKHOLMHIFGGOLFNIHF'
     response = requests.get(route.format(post_id, Config.ms_key))
@@ -107,6 +105,8 @@ def ms_ws_listener():
             if msg["event_class"] == "Feedback":
                 # Updates on feedback. Check if over threshold.
                 post_id = msg["object"]["post_id"]
+                time.sleep(1)  # This is needed due to an issue in MS API.
+
                 feedbacks = get_feedback_on_post(post_id)
                 is_over_thres = feedback_over_threshold(feedbacks)
                 if is_over_thres is None:
