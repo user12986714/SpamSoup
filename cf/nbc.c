@@ -8,10 +8,11 @@
 #define FOLD_TO 1048583
 
 /* !!!!!!! IMPORTANT !!!!!!!
- * The following constant is NOT TO BE CHANGED without original developer's review.
+ * The following two constants are NOT TO BE CHANGED without original developer's review.
  * Run a git blame and find out who is responsible for this constant value.
  * Bugs guaranteed for failures in following this advice. */
 #define BYTES_PER_RECORD 4
+#define SAMPLE_COUNTER_BYTES 8
 
 #define PRIOR_BIAS 0
 
@@ -26,7 +27,7 @@ void bayes_learn(FILE *data_file, char category){
     unsigned long hash;
     long offset;
     uint32_t hash_counter;
-    uint64_t posts_counter;
+    uint64_t sample_counter;
 
     while (scanf("%lu", &hash) != -1){
         offset = 2 * BYTES_PER_RECORD * (long)(hash % FOLD_TO);
@@ -41,23 +42,23 @@ void bayes_learn(FILE *data_file, char category){
             fwrite(&hash_counter, BYTES_PER_RECORD, 1, data_file);
         }
         else{
-            fprintf(stderr, "Hash %lu as %c overflowed.\n", hash, category);
+            fprintf(stderr, "Hash %lu as %c counter overflowed.\n", hash, category);
         }
     }
 
     offset = 2 * BYTES_PER_RECORD * (long)(FOLD_TO);
-    offset += (category == 'T') ? 0 : BYTES_PER_RECORD;
+    offset += (category == 'T') ? 0 : SAMPLE_COUNTER_BYTES;
 
     fseek(data_file, offset, SEEK_SET);
-    fread(&posts_counter, 8, 1, data_file);
+    fread(&sample_counter, SAMPLE_COUNTER_BYTES, 1, data_file);
 
-    posts_counter++;
-    if (posts_counter){
+    sample_counter++;
+    if (sample_counter){
         fseek(data_file, offset, SEEK_SET);
-        fwrite(&posts_counter, 8, 1, data_file);
+        fwrite(&sample_counter, SAMPLE_COUNTER_BYTES, 1, data_file);
     }
     else{
-        fprintf(stderr, "Total %c posts overflowed.\n", category);
+        fprintf(stderr, "Sample %c posts counter overflowed.\n", category);
     }
     return;
 }
@@ -81,16 +82,16 @@ char bayes_classify(FILE *data_file){
 
     long double posterior;
 
-    uint64_t total_tp, total_fp;
+    uint64_t sample_tp, sample_fp;
     long double sample_bias;
 
     offset = 2 * BYTES_PER_RECORD * (long)(FOLD_TO);
 
     fseek(data_file, offset, SEEK_SET);
-    fread(&total_tp, 8, 1, data_file);
-    fread(&total_fp, 8, 1, data_file);
+    fread(&sample_tp, SAMPLE_COUNTER_BYTES, 1, data_file);
+    fread(&sample_fp, SAMPLE_COUNTER_BYTES, 1, data_file);
 
-    if (!total_tp && !total_fp){
+    if (!sample_tp && !sample_fp){
         if (PRIOR_BIAS > 0.5){
                 return 'T';
         }
@@ -99,7 +100,7 @@ char bayes_classify(FILE *data_file){
         return 'F';  /* Default to fp if no post is learned. */
     }
 
-    sample_bias = (long double)(total_tp) / ((long double)(total_tp) + (long double)(total_fp));
+    sample_bias = (long double)(sample_tp) / ((long double)(sample_tp) + (long double)(sample_fp));
     posterior = PRIOR_BIAS ? PRIOR_BIAS : sample_bias;
 
     while (scanf("%lu", &hash) != -1){
