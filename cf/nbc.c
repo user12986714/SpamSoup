@@ -13,7 +13,7 @@
  * Bugs guaranteed for failures in following this advice. */
 #define BYTES_PER_RECORD 4
 
-#define PRIOR_BAIS 0
+#define PRIOR_BIAS 0
 
 void bayes_learn(FILE *data_file, char category){
     /* This function increases the counter, corresponding to the category, of hashes
@@ -82,14 +82,14 @@ char bayes_classify(FILE *data_file){
     long double posterior;
 
     uint64_t total_tp, total_fp;
-    long double sample_bais;
+    long double sample_bias;
 
     offset = 2 * BYTES_PER_RECORD * (long)(FOLD_TO);
     fseek(data_file, offset, SEEK_SET);
     fread(&total_tp, 8, 1, data_file);
     fread(&total_fp, 8, 1, data_file);
-    sample_bais = (long double)(total_tp) / ((long double)(total_tp) + (long double)(total_fp));
-    posterior = PRIOR_BAIS ? PRIOR_BAIS : sample_bais;
+    sample_bias = (long double)(total_tp) / ((long double)(total_tp) + (long double)(total_fp));
+    posterior = PRIOR_BIAS ? PRIOR_BIAS : sample_bias;
 
     while (scanf("%lu", &hash) != -1){
         offset = 2 * BYTES_PER_RECORD * (long)(hash % FOLD_TO);
@@ -102,17 +102,17 @@ char bayes_classify(FILE *data_file){
         if (total_count){
             weight = logistic(total_count);
             p_tp = (long double)(tp_count) / (long double)(total_count);
-            p_w_tp = (p_tp - sample_bais) * weight + sample_bais;
-            posterior = posterior * p_w_tp / sample_bais;
+            p_w_tp = (p_tp - sample_bias) * weight + sample_bias;
+            posterior = posterior * p_w_tp / sample_bias;
         }
         /* Else there is no data yet. Skip. */
     }
 
-    if (PRIOR_BAIS){
-        fprintf(stderr, "Confidence: %Lf @@ %Lf && %Lf", posterior, sample_bais, PRIOR_BAIS);
+    if (PRIOR_BIAS){
+        fprintf(stderr, "Confidence: %Lf @@ %Lf && %Lf", posterior, sample_bias, PRIOR_BIAS);
     }
     else{
-        fprintf(stderr, "Confidence: %Lf @@ %Lf", posterior, sample_bais);
+        fprintf(stderr, "Confidence: %Lf @@ %Lf", posterior, sample_bias);
     }
 
     if (posterior > (long double)(0.5)){
