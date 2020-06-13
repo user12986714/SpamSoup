@@ -185,7 +185,7 @@ def tokenize_string(string):
     # Argument: string
     # Returns: a list of tokens
 
-    tokens = re.compile(r"\w+").findall(string.lower())
+    tokens = re.compile(r"[-\w']+").findall(string.lower())
     return [tokens[i] for i in range(len(tokens)) if tokens[i] not in stopword.wordlist]
 
 
