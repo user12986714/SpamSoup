@@ -9,6 +9,7 @@ import subprocess
 import requests
 import websocket
 from config import Config
+import stopword
 
 
 def get_feedback_on_post(post_id):
@@ -179,17 +180,21 @@ def feedback_over_threshold(feedbacks):
     return None  # Not yet
 
 
+def tokenize_string(string):
+    """ Split a string into tokens. """
+    # Argument: string
+    # Returns: a list of tokens
+
+    tokens = re.compile(r"[-\w']+").findall(string.lower())
+    return [tokens[i] for i in range(len(tokens)) if tokens[i] not in stopword.wordlist]
+
+
 def naive_tokenizer(post_tuple):
-    """ Naive tokenizer, splitting string at whitespace. """
+    """ Naive tokenizer, splitting string at non-word chars and remove stopwords. """
     # Argument: the tuple returned by get_post() or ms_ws_listener()
     # Returns: tokenized string list
 
-    tokenized_title = post_tuple[0].replace("\n", " ").split(" ")
-    tokenized_body = post_tuple[1].replace("\n", " ").split(" ")
-    # Make unified_user_site_id unique from other potential tokens
-    # by whitespace and other identifiable substrings
-    # post[2] == (user_site, user_id, user_name)
-    unified_user_site_id = "##usr## " + post_tuple[2][1] + " ::@:: " + post_tuple[2][0]
+    unified_user_site_id = "##USR## " + post_tuple[2][1] + " ::@:: " + post_tuple[2][0]
     tokenized_post = list()
 
     # Use SBPH wisely. The first token will be multiplied by 16,
@@ -197,8 +202,8 @@ def naive_tokenizer(post_tuple):
     # Hence the first token acts like uid black/white list
     tokenized_post.append(unified_user_site_id)
     tokenized_post.append(post_tuple[2][2])  # This is the username
-    tokenized_post.extend(tokenized_title)
-    tokenized_post.extend(tokenized_body)
+    tokenized_post.extend(tokenize_string(post_tuple[0]))
+    tokenized_post.extend(tokenize_string(post_tuple[1]))
 
     return [x for x in tokenized_post if x]
 
