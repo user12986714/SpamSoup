@@ -8,7 +8,7 @@ import time
 import subprocess
 import requests
 import websocket
-from config import Config
+from config import Config, Version, Location
 import stopword
 
 
@@ -68,7 +68,7 @@ def conn_ms_ws():
 def init_ms_ws():
     """ Initiate metasmoke websocket. """
     failure_count = 0
-    while failure_count < Config.MS_WS_MAX_RETRIES:
+    while failure_count < Config.ms_ws_max_retries:
         ws = conn_ms_ws()
         if ws:
             return ws
@@ -145,7 +145,8 @@ def ms_ws_listener():
             # User decides to exit.
             ws.close()
             return None
-        except Exception:
+        except Exception as e:
+            print(e)
             # Reconnect.
             try:
                 ws.close()
@@ -245,8 +246,8 @@ def analyze_post(post_id, post_tuple):
     bow_nbc_out = bow_nbc.communicate()
 
     print("Post {} classified as: ".format(post_id))
-    print( "NT-SBPH-NBC: {}; ".format(sbph_nbc_out))
-    print( "NT-Ngram-NBC: {}; ".format(ngram_nbc_out))
+    print("NT-SBPH-NBC: {}; ".format(sbph_nbc_out))
+    print("NT-Ngram-NBC: {}; ".format(ngram_nbc_out))
     print("NT-BoW-NBC: {}\n".format(bow_nbc_out))
 
 
@@ -289,4 +290,12 @@ def learn_post(post_id, post_tuple, is_tp):
 
 # Ad hoc code ends here
 if __name__ == "__main__":
+    ver_info = "SpamSoup {major} ({alias}) started at version " +\
+               "{major}.{minor} on {admin}/{name}."
+    print(ver_info.format(major=Version.major,
+                          alias=Version.alias,
+                          minor=Version.minor,
+                          admin=Location.admin,
+                          name=Location.name))
+
     ms_ws_listener()
