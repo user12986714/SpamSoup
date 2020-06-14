@@ -11,7 +11,7 @@
 #define PHRASE_PER_GROUP 5
 #define OUTPUT_HASH_PER_GROUP 16
 
-void sbp_hash(unsigned long *sbph_result, unsigned long *hash){
+void sbp_hash(unsigned long *sbph_result, unsigned long *hashes){
     /* This function converts an array of 5 unsigned long intergers to an array of 16 unsigned long integer hashes.
      * Arguments:
      * sbph_result shall be an array of 16 unsigned long elements;
@@ -22,13 +22,13 @@ void sbp_hash(unsigned long *sbph_result, unsigned long *hash){
      * only the lower 32 bits are significant and other bits are set to 0. */
     unsigned long coef, mask;
 
-    for (unsigned int i = 0; i < OUTPUT_HASH_PER_GROUP; i++){
-        sbph_result[i] = 2 * hash[0];  /* The least term is always significant. */
+    for (size_t i = 0; i < OUTPUT_HASH_PER_GROUP; i++){
+        sbph_result[i] = 2 * hashes[0];  /* The least term is always significant. */
 
-        for (unsigned int j = 1; j < PHRASE_PER_GROUP; j++){
+        for (size_t j = 1; j < PHRASE_PER_GROUP; j++){
             coef = (1 << j) + 1;
             mask = i & (1 << (j - 1));
-            sbph_result[i] += mask * coef * hash[j];
+            sbph_result[i] += mask * coef * hashes[j];
         }
 
         sbph_result[i] &= MASK_32_BITS;
@@ -47,24 +47,32 @@ int main(){
      * Input may consist many lines, with one phrase on each line. An EOF signal shall be sent when input ends.
      * Output format:
      * Output consists many lines, with one hash on each line. Each hash is represented by a base 10 integer.
-     * The number of lines in the output is 16 times of that of input. An EOF signal will be sent when output ends. */
+     * For first four lines of input, there will be 2 ^ (i - 1) output lines for i-th input line.
+     * For later lines, there will be 16 output lines for each input line. */
     unsigned char *phrase;
     size_t size_phrase = 0;
     ssize_t len_phrase;
     unsigned long hash_r[PHRASE_PER_GROUP] = {0};
     unsigned long sbph_r[OUTPUT_HASH_PER_GROUP];
 
+    size_t missing_phrases = PHRASE_PER_GROUP, avai_hashes;
+
     while ((len_phrase = getline((char **)(&phrase), &size_phrase, stdin)) != -1){
         strip_endl(phrase, &len_phrase);
 
-        for (unsigned int i = PHRASE_PER_GROUP - 1; i > 0; i--){
+        for (size_t i = PHRASE_PER_GROUP - 1; i > 0; i--){
             hash_r[i] = hash_r[i - 1];
         }
 
         hash_r[0] = str_hash(phrase, (size_t)(len_phrase));
         sbp_hash(sbph_r, hash_r);
 
-        for (unsigned int i = 0; i < OUTPUT_HASH_PER_GROUP; i++){
+        if (missing_phrases){
+            avai_hashes = 1 << (PHRASE_PER_GROUP - missing_phrases);
+            missing_phrases--;
+        }
+
+        for (size_t i = 0; i < avai_hashes; i++){
             printf("%lu\n", sbph_r[i]);
         }
     }
