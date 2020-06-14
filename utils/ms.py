@@ -8,7 +8,8 @@ import time
 import subprocess
 import requests
 import websocket
-from config import Config
+from config import Config, Version, Location
+import stopword
 
 
 def get_feedback_on_post(post_id):
@@ -40,8 +41,11 @@ def get_post(post_id):
     user_link = data["items"][0]["user_link"]
     user_re = re.search(r'^(?:https?:)?\/\/([a-z.]+)\/users\/([0-9]+)', user_link)
 
-    user = (user_re.group(1), user_re.group(2),
-            data["items"][0]["username"])
+    try:
+        user = (user_re.group(1), user_re.group(2),
+                data["items"][0]["username"])
+    except AttributeError:
+        user = ("DELETED", "-2", "A deleted user")  # -1 is used by Community
 
     return (data["items"][0]["title"], data["items"][0]["body"], user)
 
@@ -64,10 +68,12 @@ def conn_ms_ws():
 def init_ms_ws():
     """ Initiate metasmoke websocket. """
     failure_count = 0
-    while failure_count < Config.MS_WS_MAX_RETRIES:
+    while failure_count < Config.ms_ws_max_retries:
         ws = conn_ms_ws()
         if ws:
             return ws
+
+        failure_count += 1
 
     # Give up
     raise RuntimeError("Cannot connect to MS websocket.")
@@ -82,8 +88,10 @@ def ms_ws_listener():
             data = json.loads(resp)
 
             if "type" in data:
+                if data["type"] == "welcome":
+                    print("Successfully connected to MS WebSocket.\n")
                 if data["type"] == "reject_subscription":
-                    raise RuntimeError("MS WS connection rejected.")
+                    raise RuntimeError("MS WS connection rejected.\n")
                 if data["type"] == "ping":
                     continue
 
@@ -93,29 +101,43 @@ def ms_ws_listener():
             msg = data["message"]
             if msg["event_class"] == "Post":
                 # New post created. Analyze it.
+                print("New post {} received from WebSocket.\n".format(msg["object"]["id"]))
                 user_link = msg["object"]["user_link"]
                 user_re = re.search(r'^(?:https?:)?\/\/([a-z.]+)\/users\/([0-9]+)', user_link)
 
-                user = (user_re.group(1), user_re.group(2),
-                        msg["object"]["username"])
+                try:
+                    user = (user_re.group(1), user_re.group(2),
+                            msg["object"]["username"])
+                except AttributeError:
+                    user = ("DELETED", "-2", "A deleted user")  # -1 is used by Community
 
                 post_tuple = (msg["object"]["title"], msg["object"]["body"], user)
-                analyze_post(post_tuple)
+                analyze_post(msg["object"]["id"], post_tuple)
 
             if msg["event_class"] == "Feedback":
                 # Updates on feedback. Check if over threshold.
                 post_id = msg["object"]["post_id"]
+                print("New feedback event on post {} received from WebSocket.\n".format(post_id))
+
                 time.sleep(1)  # This is needed due to an issue in MS API.
 
                 feedbacks = get_feedback_on_post(post_id)
+                # No empty line between the following two prints.
+                print("List of Feedbacks on post {} fetched from HTTP.".format(post_id))
+                print(feedbacks)
+                print("")  # Print an empty after feedbacks.
+
                 is_over_thres = feedback_over_threshold(feedbacks)
                 if is_over_thres is None:
                     # Not yet.
+                    print("Feedbacks on post {} are insufficient.\n".format(post_id))
                     continue
+                print("Post {} registered as {}\n".format(post_id, "tp" if is_over_thres else "fp"))
 
                 # Fetch post to be learned.
                 post_tuple = get_post(post_id)
-                learn_post(post_tuple, is_over_thres)
+                print("Post {} fetched from HTTP.\n".format(post_id))
+                learn_post(post_id, post_tuple, is_over_thres)
         except RuntimeError:
             # Severe errors
             raise
@@ -123,7 +145,8 @@ def ms_ws_listener():
             # User decides to exit.
             ws.close()
             return None
-        except Exception:
+        except Exception as e:
+            print(e)
             # Reconnect.
             try:
                 ws.close()
@@ -166,33 +189,34 @@ def feedback_over_threshold(feedbacks):
     return None  # Not yet
 
 
+def tokenize_string(string):
+    """ Split a string into tokens. """
+    # Argument: string
+    # Returns: a list of tokens
+
+    tokens = re.compile(r"[-\w']+").findall(string.lower())
+    return [tokens[i] for i in range(len(tokens)) if tokens[i] not in stopword.wordlist]
+
+
 def naive_tokenizer(post_tuple):
-    """ Naive tokenizer, splitting string at whitespace. """
+    """ Naive tokenizer, splitting string at non-word chars and remove stopwords. """
     # Argument: the tuple returned by get_post() or ms_ws_listener()
     # Returns: tokenized string list
 
-    tokenized_title = post_tuple[0].replace("\n", " ").split(" ")
-    tokenized_body = post_tuple[1].replace("\n", " ").split(" ")
-    # Make unified_user_site_id unique from other potential tokens
-    # by whitespace and other identifiable substrings
-    # post[2] == (user_site, user_id, user_name)
-    unified_user_site_id = "##usr## " + post_tuple[2][1] + " ::@:: " + post_tuple[2][0]
+    unified_user_site_id = "##USR## " + post_tuple[2][1] + " ::@:: " + post_tuple[2][0]
     tokenized_post = list()
 
-    # Use SBPH wisely. The first token will be multiplied by 16,
-    # the second by 8, the third by 4, and fourth by 2.
-    # Hence the first token acts like uid black/white list
     tokenized_post.append(unified_user_site_id)
     tokenized_post.append(post_tuple[2][2])  # This is the username
-    tokenized_post.extend(tokenized_title)
-    tokenized_post.extend(tokenized_body)
+    tokenized_post.extend(tokenize_string(post_tuple[0]))
+    tokenized_post.extend(tokenize_string(post_tuple[1]))
 
     return [x for x in tokenized_post if x]
 
 
 # Ad hoc code ahead.
 # Please consider improving the following code to make them extensible.
-def analyze_post(post_tuple):
+def analyze_post(post_id, post_tuple):
     """ Call appropriate executables to analyze the post. """
     tokenized_post = naive_tokenizer(post_tuple)
     tokenized_post_str = "\n".join(tokenized_post) + "\n"
@@ -217,16 +241,17 @@ def analyze_post(post_tuple):
     bow.stdin.write(tokenized_post_bytes)
     bow.stdin.close()
 
-    sbph_nbc_out = sbph_nbc.communicate()[0].decode("utf-8")[0]
-    ngram_nbc_out = ngram_nbc.communicate()[0].decode("utf-8")[0]
-    bow_nbc_out = bow_nbc.communicate()[0].decode("utf-8")[0]
+    sbph_nbc_out = sbph_nbc.communicate()
+    ngram_nbc_out = ngram_nbc.communicate()
+    bow_nbc_out = bow_nbc.communicate()
 
-    print("Classify post: NT-SBPH-NBC: {}; NT-Ngram-NBC: {}; NT-BoW-NBC: {}".format(sbph_nbc_out,
-                                                                                    ngram_nbc_out,
-                                                                                    bow_nbc_out))
+    print("Post {} classified as: ".format(post_id))
+    print("NT-SBPH-NBC: {}; ".format(sbph_nbc_out))
+    print("NT-Ngram-NBC: {}; ".format(ngram_nbc_out))
+    print("NT-BoW-NBC: {}\n".format(bow_nbc_out))
 
 
-def learn_post(post_tuple, is_tp):
+def learn_post(post_id, post_tuple, is_tp):
     """ Call appropriate executables to learn the post. """
     learn_arg_str = "--learn={}".format("T" if is_tp else "F")
 
@@ -253,15 +278,24 @@ def learn_post(post_tuple, is_tp):
     bow.stdin.write(tokenized_post_bytes)
     bow.stdin.close()
 
-    sbph_nbc_out = sbph_nbc.communicate()[0].decode("utf-8")[0]
-    ngram_nbc_out = ngram_nbc.communicate()[0].decode("utf-8")[0]
-    bow_nbc_out = bow_nbc.communicate()[0].decode("utf-8")[0]
+    sbph_nbc_out = sbph_nbc.communicate()
+    ngram_nbc_out = ngram_nbc.communicate()
+    bow_nbc_out = bow_nbc.communicate()
 
-    print("Learn post: NT-SBPH-NBC: {}; NT-Ngram-NBC: {}; NT-BoW-NBC: {}".format(sbph_nbc_out,
-                                                                                 ngram_nbc_out,
-                                                                                 bow_nbc_out))
+    print("Post {} learned as: ".format(post_id))
+    print("NT-SBPH-NBC: {}; ".format(sbph_nbc_out))
+    print("NT-Ngram-NBC: {}; ".format(ngram_nbc_out))
+    print("NT-BoW-NBC: {}\n".format(bow_nbc_out))
 
 
 # Ad hoc code ends here
 if __name__ == "__main__":
+    ver_info = "SpamSoup {major} ({alias}) started at version " +\
+               "{major}.{minor} on {admin}/{name}."
+    print(ver_info.format(major=Version.major,
+                          alias=Version.alias,
+                          minor=Version.minor,
+                          admin=Location.admin,
+                          name=Location.name))
+
     ms_ws_listener()

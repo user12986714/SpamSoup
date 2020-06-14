@@ -6,7 +6,7 @@
 /* !!! Notice !!!
  * If the following constant is changed, it must be a prime.
  * At the same time, all learning data for this program need to be migrated. */
-#define FOLD_TO 1048583
+#define FOLD_TO 8388617
 
 /* !!!!!!! IMPORTANT !!!!!!!
  * The following two constants are NOT TO BE CHANGED without original developer's review.
@@ -24,9 +24,15 @@ void bayes_learn(FILE *data_file, char category){
      * Outcome:
      * The corresponding counter will be increased. */
     unsigned long hash;
-    long offset;
+    long offset, sc_offset;
     uint32_t hash_counter;
     uint64_t sample_counter;
+
+    sc_offset = 2 * BYTES_PER_RECORD * (long)(FOLD_TO);
+    sc_offset += (category == 'T') ? 0 : SAMPLE_COUNTER_BYTES;
+
+    fseek(data_file, sc_offset, SEEK_SET);
+    fread(&sample_counter, SAMPLE_COUNTER_BYTES, 1, data_file);
 
     while (scanf("%lu", &hash) != -1){
         offset = 2 * BYTES_PER_RECORD * (long)(hash % FOLD_TO);
@@ -37,6 +43,12 @@ void bayes_learn(FILE *data_file, char category){
 
         hash_counter++;
         if ((uint32_t)(hash_counter + 1)){
+            sample_counter++;
+            if (!(uint64_t)(sample_counter + 1)){
+                fprintf(stderr, "Sample %c counter overflowed.\n", category);
+                break;  /* No more learning can happen. */
+            }
+
             fseek(data_file, offset, SEEK_SET);
             fwrite(&hash_counter, BYTES_PER_RECORD, 1, data_file);
         }
@@ -45,20 +57,12 @@ void bayes_learn(FILE *data_file, char category){
         }
     }
 
-    offset = 2 * BYTES_PER_RECORD * (long)(FOLD_TO);
-    offset += (category == 'T') ? 0 : SAMPLE_COUNTER_BYTES;
-
-    fseek(data_file, offset, SEEK_SET);
-    fread(&sample_counter, SAMPLE_COUNTER_BYTES, 1, data_file);
-
-    sample_counter++;
-    if ((uint64_t)(sample_counter + 1)){
-        fseek(data_file, offset, SEEK_SET);
-        fwrite(&sample_counter, SAMPLE_COUNTER_BYTES, 1, data_file);
+    if (!(uint64_t)(sample_counter + 1)){
+        sample_counter--;
     }
-    else{
-        fprintf(stderr, "Sample %c posts counter overflowed.\n", category);
-    }
+    fseek(data_file, sc_offset, SEEK_SET);
+    fwrite(&sample_counter, SAMPLE_COUNTER_BYTES, 1, data_file);
+
     return;
 }
 
