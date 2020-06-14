@@ -10,7 +10,7 @@ class Config:
     ms_key = "your_ms_key_here"
     ms_host = "ms_host_here"
     ms_ws_host = "ms_websocket_host_here"
-    MS_WS_MAX_RETRIES = 5  # Max retries before giving up
+    ms_ws_max_retries = 5  # Max retries before giving up
 
     # Feedback threshold
     naa_bias = 0.5  # Need to be in [0, 1]
@@ -29,3 +29,17 @@ class Config:
     sbph_nbc_dat_loc = "/abs/path/to/sbph/nbc/data"
     ngram_nbc_dat_loc = "/abs/path/to/ngram/nbc/data"
     bow_nbc_dat_loc = "/abs/path/to/bow/nbc/data"
+
+
+class Location:
+    """ Configurations for location. """
+    admin = "me"  # The user running this instance
+    name = "my_instance"  # The name for this instance
+
+
+class Version:
+    """ Version information. """
+    # Please don't change any value in this class when configuring.
+    major = 0
+    alias = "Unsure"
+    minor = 0
