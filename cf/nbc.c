@@ -6,7 +6,7 @@
 /* !!! Notice !!!
  * If the following constant is changed, it must be a prime.
  * At the same time, all learning data for this program need to be migrated. */
-#define FOLD_TO 1048583
+#define FOLD_TO 8388617
 
 /* !!!!!!! IMPORTANT !!!!!!!
  * The following two constants are NOT TO BE CHANGED without original developer's review.
