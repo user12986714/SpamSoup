@@ -5,20 +5,23 @@ if [ -d "bin" ]; then
 fi
 
 mkdir bin
-mkdir bin/cf
+mkdir bin/tk
 mkdir bin/vc
-mkdir bin/utils
+mkdir bin/cf
 
-cc src/cf/nbc.c cf/cfutils.c -lm -Wall -o bin/cf/nbc
+cp src/tk/nt.py bin/tk/nt.py
+cp src/tk/stopword.py bin/tk/stopword.py
 
-cc src/vc/sbph.c vc/vcutils.c -Wall -o bin/vc/sbph
-cc src/vc/ngram.c vc/vcutils.c -Wall -o bin/vc/ngram
-cc src/vc/bow.c vc/vcutils.c -Wall -o bin/vc/bow
+cc src/vc/sbph.c src/vc/vcutils.c -Wall -o bin/vc/sbph
+cc src/vc/ngram.c src/vc/vcutils.c -Wall -o bin/vc/ngram
+cc src/vc/bow.c src/vc/vcutils.c -Wall -o bin/vc/bow
 
-cp src/utils/mknbcdat.sh bin/utils/mknbcdat.sh
+cc src/cf/nbc.c src/cf/cfutils.c -lm -Wall -o bin/cf/nbc
+
 cp src/ms.py bin/ms.py
-cp src/config.py bin/config.py
-cp src/stopword.py bin/stopword.py
+cp src/config.json bin/config.json
+cp src/verinfo.json bin/verinfo.json
 
-chmod +x bin/utils/mknbcdat.sh
-chmod +x bin/utils/ms.py
+chmod +x utils/mknbcdat.sh
+
+chmod +x bin/ms.py
