@@ -1,26 +1,24 @@
 #!/usr/bin/sh
 
-DIR="bin"
-
-if [ -d "$DIR" ]; then
-    rm -rf $DIR
+if [ -d "bin" ]; then
+    rm -rf bin
 fi
 
-mkdir $DIR
-mkdir $DIR/cf
-mkdir $DIR/vc
-mkdir $DIR/utils
+mkdir bin
+mkdir bin/cf
+mkdir bin/vc
+mkdir bin/utils
 
-cc cf/nbc.c cf/cfutils.c -lm -Wall -o $DIR/cf/nbc
+cc src/cf/nbc.c cf/cfutils.c -lm -Wall -o bin/cf/nbc
 
-cc vc/sbph.c vc/vcutils.c -Wall -o $DIR/vc/sbph
-cc vc/ngram.c vc/vcutils.c -Wall -o $DIR/vc/ngram
-cc vc/bow.c vc/vcutils.c -Wall -o $DIR/vc/bow
+cc src/vc/sbph.c vc/vcutils.c -Wall -o bin/vc/sbph
+cc src/vc/ngram.c vc/vcutils.c -Wall -o bin/vc/ngram
+cc src/vc/bow.c vc/vcutils.c -Wall -o bin/vc/bow
 
-cp utils/mknbcdat.sh $DIR/utils/mknbcdat.sh
-cp utils/ms.py $DIR/utils/ms.py
-cp utils/config.py $DIR/utils/config.py
-cp utils/stopword.py $DIR/utils/stopword.py
+cp src/utils/mknbcdat.sh bin/utils/mknbcdat.sh
+cp src/utils/ms.py bin/utils/ms.py
+cp src/utils/config.py bin/utils/config.py
+cp src/utils/stopword.py bin/utils/stopword.py
 
-chmod +x $DIR/utils/mknbcdat.sh
-chmod +x $DIR/utils/ms.py
+chmod +x bin/utils/mknbcdat.sh
+chmod +x bin/utils/ms.py
