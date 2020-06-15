@@ -8,17 +8,16 @@ import time
 import subprocess
 import requests
 import websocket
-from config import Config, Version, Location
-import stopword
+from tk.nt import naive_tokenizer
 
 
 def get_feedback_on_post(post_id):
     """ Get the list of feedback on post. """
     # Returns: A list of tuples with each in format (uid, feedback).
 
-    route = Config.ms_host + '/api/v2.0/feedbacks/post/' +\
+    route = config["ms"]["host"] + '/api/v2.0/feedbacks/post/' +\
                              '{}?key={}&filter=JJLFGJOFIOMFLGHJLHNIFMGJILKJKHOLMHIFGGOLFNIHF'
-    response = requests.get(route.format(post_id, Config.ms_key))
+    response = requests.get(route.format(post_id, config["ms"]["key"]))
     data = response.json()
 
     feedbacks = list()
@@ -33,9 +32,9 @@ def get_post(post_id):
     """ Get the post. """
     # Returns: A tuple (post_title, post_body, (user_site, user_id, user_name))
 
-    route = Config.ms_host + '/api/v2.0/posts/' +\
+    route = config["ms"]["host"] + '/api/v2.0/posts/' +\
                              '{}?key={}&filter=MLLKIHJMHIHKKFMJLLHGMKIMMGOKFFN'
-    response = requests.get(route.format(post_id, Config.ms_key))
+    response = requests.get(route.format(post_id, config["ms"]["key"]))
     data = response.json()
 
     user_link = data["items"][0]["user_link"]
@@ -53,9 +52,9 @@ def get_post(post_id):
 def conn_ms_ws():
     """ Connect to metasmoke websocket. """
     try:
-        ws = websocket.create_connection(Config.ms_ws_host, origin=Config.ms_host)
+        ws = websocket.create_connection(config["ms"]["ws_host"], origin=config["ms"]["host"])
         idf = r'{"channel": "ApiChannel",' +\
-              r'"key": "{}",'.format(Config.ms_key) +\
+              r'"key": "{}",'.format(config["ms"]["key"]) +\
               r'"events": "feedbacks#create;posts#create"}'
         payload = json.dumps({"command": "subscribe", "identifier": idf})
         ws.send(payload)
@@ -68,7 +67,7 @@ def conn_ms_ws():
 def init_ms_ws():
     """ Initiate metasmoke websocket. """
     failure_count = 0
-    while failure_count < Config.ms_ws_max_retries:
+    while failure_count < config["ms"]["ws_retry"]:
         ws = conn_ms_ws()
         if ws:
             return ws
@@ -125,7 +124,7 @@ def ms_ws_listener():
                 # No empty line between the following two prints.
                 print("List of Feedbacks on post {} fetched from HTTP.".format(post_id))
                 print(feedbacks)
-                print("")  # Print an empty after feedbacks.
+                print("")  # Print an empty line after feedbacks.
 
                 is_over_thres = feedback_over_threshold(feedbacks)
                 if is_over_thres is None:
@@ -171,47 +170,22 @@ def feedback_over_threshold(feedbacks):
         if feedback.startswith("naa") or feedback.startswith("ignore"):
             naa_count += 1
 
-    w_tp_count = tp_count + naa_count * Config.naa_bias
-    w_fp_count = fp_count + naa_count * (1 - Config.naa_bias)
+    w_tp_count = tp_count + naa_count * config["feedback"]["naa_bias"]
+    w_fp_count = fp_count + naa_count * (1 - config["feedback"]["naa_bias"])
 
-    if (w_fp_count == 0) and (w_tp_count >= Config.un_thres):
+    if (w_fp_count == 0) and (w_tp_count >= config["feedback"]["un_thres"]):
         return True
-    if (w_tp_count == 0) and (w_fp_count >= Config.un_thres):
+    if (w_tp_count == 0) and (w_fp_count >= config["feedback"]["un_thres"]):
         return False
 
     if w_tp_count and w_fp_count:
         # Controversial posts
-        if (w_tp_count / w_fp_count) >= Config.co_thres:
+        if (w_tp_count / w_fp_count) >= config["feedback"]["co_thres"]:
             return True
-        if (w_fp_count / w_tp_count) >= Config.co_thres:
+        if (w_fp_count / w_tp_count) >= config["feedback"]["co_thres"]:
             return False
 
     return None  # Not yet
-
-
-def tokenize_string(string):
-    """ Split a string into tokens. """
-    # Argument: string
-    # Returns: a list of tokens
-
-    tokens = re.compile(r"[-\w']+").findall(string.lower())
-    return [tokens[i] for i in range(len(tokens)) if tokens[i] not in stopword.wordlist]
-
-
-def naive_tokenizer(post_tuple):
-    """ Naive tokenizer, splitting string at non-word chars and remove stopwords. """
-    # Argument: the tuple returned by get_post() or ms_ws_listener()
-    # Returns: tokenized string list
-
-    unified_user_site_id = "##USR## " + post_tuple[2][1] + " ::@:: " + post_tuple[2][0]
-    tokenized_post = list()
-
-    tokenized_post.append(unified_user_site_id)
-    tokenized_post.append(post_tuple[2][2])  # This is the username
-    tokenized_post.extend(tokenize_string(post_tuple[0]))
-    tokenized_post.extend(tokenize_string(post_tuple[1]))
-
-    return [x for x in tokenized_post if x]
 
 
 # Ad hoc code ahead.
@@ -222,15 +196,15 @@ def analyze_post(post_id, post_tuple):
     tokenized_post_str = "\n".join(tokenized_post) + "\n"
     tokenized_post_bytes = tokenized_post_str.encode("utf-8")
 
-    sbph = subprocess.Popen([Config.sbph_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ngram = subprocess.Popen([Config.ngram_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    bow = subprocess.Popen([Config.bow_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    sbph = subprocess.Popen([config["vc"]["sbph"]["bin"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ngram = subprocess.Popen([config["vc"]["ngram"]["bin"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    bow = subprocess.Popen([config["vc"]["bow"]["bin"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    sbph_nbc = subprocess.Popen([Config.nbc_bin_loc, "--classify", "--data=" + Config.sbph_nbc_dat_loc],
+    sbph_nbc = subprocess.Popen([config["cf"]["nbc"]["bin"], "--classify", "--data=" + config["cf"]["nbc"]["dat"]["sbph"]],
                                 stdin=sbph.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ngram_nbc = subprocess.Popen([Config.nbc_bin_loc, "--classify", "--data=" + Config.ngram_nbc_dat_loc],
+    ngram_nbc = subprocess.Popen([config["cf"]["nbc"]["bin"], "--classify", "--data=" + config["cf"]["nbc"]["dat"]["ngram"]],
                                  stdin=ngram.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    bow_nbc = subprocess.Popen([Config.nbc_bin_loc, "--classify", "--data=" + Config.bow_nbc_dat_loc],
+    bow_nbc = subprocess.Popen([config["cf"]["nbc"]["bin"], "--classify", "--data=" + config["cf"]["nbc"]["dat"]["bow"]],
                                stdin=bow.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # Start
@@ -259,15 +233,15 @@ def learn_post(post_id, post_tuple, is_tp):
     tokenized_post_str = "\n".join(tokenized_post) + "\n"
     tokenized_post_bytes = tokenized_post_str.encode("utf-8")
 
-    sbph = subprocess.Popen([Config.sbph_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ngram = subprocess.Popen([Config.ngram_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    bow = subprocess.Popen([Config.bow_bin_loc], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    sbph = subprocess.Popen([config["vc"]["sbph"]["bin"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ngram = subprocess.Popen([config["vc"]["ngram"]["bin"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    bow = subprocess.Popen([config["vc"]["bow"]["bin"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    sbph_nbc = subprocess.Popen([Config.nbc_bin_loc, learn_arg_str, "--data=" + Config.sbph_nbc_dat_loc],
+    sbph_nbc = subprocess.Popen([config["cf"]["nbc"]["bin"], learn_arg_str, "--data=" + config["cf"]["nbc"]["dat"]["sbph"]],
                                 stdin=sbph.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ngram_nbc = subprocess.Popen([Config.nbc_bin_loc, learn_arg_str, "--data=" + Config.ngram_nbc_dat_loc],
+    ngram_nbc = subprocess.Popen([config["cf"]["nbc"]["bin"], learn_arg_str, "--data=" + config["cf"]["nbc"]["dat"]["ngram"]],
                                  stdin=ngram.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    bow_nbc = subprocess.Popen([Config.nbc_bin_loc, learn_arg_str, "--data=" + Config.bow_nbc_dat_loc],
+    bow_nbc = subprocess.Popen([config["cf"]["nbc"]["bin"], learn_arg_str, "--data=" + config["cf"]["nbc"]["dat"]["bow"]],
                                stdin=bow.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # Start
@@ -288,14 +262,22 @@ def learn_post(post_id, post_tuple, is_tp):
     print("NT-BoW-NBC: {}\n".format(bow_nbc_out))
 
 
+def load_json(file_path):
+    """ Load config from json file. """
+    with open(file_path, "r", encoding="utf-8") as json_file:
+        return json.load(json_file)
+
+
 # Ad hoc code ends here
 if __name__ == "__main__":
-    ver_info = "SpamSoup {major} ({alias}) started at version " +\
+    config = load_json("config.json")
+    ver_info = load_json("verinfo.json")
+    ver_str = "SpamSoup {major} ({alias}) started at version " +\
                "{major}.{minor} on {admin}/{name}."
-    print(ver_info.format(major=Version.major,
-                          alias=Version.alias,
-                          minor=Version.minor,
-                          admin=Location.admin,
-                          name=Location.name))
+    print(ver_str.format(major=ver_info["major"],
+                          alias=ver_info["alias"],
+                          minor=ver_info["minor"],
+                          admin=config["location"].admin,
+                          name=config["location"].name))
 
     ms_ws_listener()
