@@ -67,12 +67,13 @@ def conn_ms_ws():
 def init_ms_ws():
     """ Initiate metasmoke websocket. """
     failure_count = 0
-    while failure_count < config["ms"]["ws_retry"]:
+    while failure_count < config["ms"]["ws_err"]["retry"]:
         ws = conn_ms_ws()
         if ws:
             return ws
 
         failure_count += 1
+        time.sleep(config["ms"]["ws_err"]["sleep"])
 
     # Give up
     raise RuntimeError("Cannot connect to MS websocket.")
