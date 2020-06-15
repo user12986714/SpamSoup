@@ -1,1 +1,37 @@
-{"ms":{"host":"","key":"","ws_host":"","ws_retry":""},"feedback":{"naa_bias":"","un_thres":"","co_thres":""},"vc":{"sbph":{"bin":""},"ngram":{"bin":""},"bow":{"bin":""}}, "cf":{"nbc":{"bin":"","dat":{"sbph":"","ngram":"","bow":""}}}}
+{
+    "ms": {
+        "host": "Metasmoke host",
+        "key": "Metasmoke key",
+        "ws_host": "Metasmoke WebSocket host",
+        "ws_err": {
+            "sleep": 10,
+            "retry": 5
+        }
+    },
+    "feedback": {
+        "naa_bias": 0.5,
+        "un_thres": 2,
+        "co_thres": 3
+    },
+    "vc": {
+        "sbph": {
+            "bin": "/abs/path/sbph"
+        },
+        "ngram": {
+            "bin": "/abs/path/ngram"
+        },
+        "bow": {
+            "bin": "/abs/path/bow"
+        }
+    },
+    "cf": {
+        "nbc": {
+            "bin": "/abs/path/nbc",
+            "dat": {
+                "sbph": "/abs/path/sbph/data",
+                "ngram": "/abs/path/ngram/data",
+                "bow": "/abs/path/bow/data"
+            }
+        }
+    }
+}
