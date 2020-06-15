@@ -16,9 +16,9 @@ cc src/vc/ngram.c vc/vcutils.c -Wall -o bin/vc/ngram
 cc src/vc/bow.c vc/vcutils.c -Wall -o bin/vc/bow
 
 cp src/utils/mknbcdat.sh bin/utils/mknbcdat.sh
-cp src/utils/ms.py bin/utils/ms.py
-cp src/utils/config.py bin/utils/config.py
-cp src/utils/stopword.py bin/utils/stopword.py
+cp src/ms.py bin/ms.py
+cp src/config.py bin/config.py
+cp src/stopword.py bin/stopword.py
 
 chmod +x bin/utils/mknbcdat.sh
 chmod +x bin/utils/ms.py
