@@ -278,7 +278,7 @@ if __name__ == "__main__":
     print(ver_str.format(major=ver_info["major"],
                           alias=ver_info["alias"],
                           minor=ver_info["minor"],
-                          admin=config["location"].admin,
-                          name=config["location"].name))
+                          admin=config["location"]["admin"],
+                          name=config["location"]["name"]))
 
     ms_ws_listener()

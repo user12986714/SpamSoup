@@ -2,7 +2,7 @@
 # coding=utf-8
 
 """ Implements naive tokenizer, generating word tokens and remove stopwords. """
-import stopword
+stopword = ["stopword list here"]
 
 
 def tokenize_string(string):
@@ -11,7 +11,7 @@ def tokenize_string(string):
     # Returns: a list of tokens
 
     tokens = re.compile(r"[-\w']+").findall(string.lower())
-    return [tokens[i] for i in range(len(tokens)) if tokens[i] not in stopword.wordlist]
+    return [tokens[i] for i in range(len(tokens)) if tokens[i] not in stopword]
 
 
 def naive_tokenizer(post_tuple):

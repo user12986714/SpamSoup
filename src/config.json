@@ -33,5 +33,9 @@
                 "bow": "/abs/path/bow/data"
             }
         }
+    },
+    "location": {
+        "admin": "instance_owner",
+        "name": "instance_name"
     }
 }
