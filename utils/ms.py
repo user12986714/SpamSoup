@@ -74,6 +74,7 @@ def init_ms_ws():
             return ws
 
         failure_count += 1
+        time.sleep(10)
 
     # Give up
     raise RuntimeError("Cannot connect to MS websocket.")
