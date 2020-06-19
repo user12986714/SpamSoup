@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
 # coding=utf-8
 
+import re
+from stopword import stopword
+
 """ Implements naive tokenizer, generating word tokens and remove stopwords. """
-stopword = ["stopword list here"]
 
 
 def tokenize_string(string):
@@ -28,3 +29,18 @@ def naive_tokenizer(post_tuple):
     tokenized_post.extend(tokenize_string(post_tuple[1]))
 
     return [x for x in tokenized_post if x]
+
+
+def feedback_over_threshold(feedbacks):
+    """ Determine if feedbacks for a post is over learning threshold. """
+    pass
+
+
+def analyze_post(post_id, post_tuple):
+    """ Call appropriate executables to analyze the post. """
+    pass
+
+
+def learn_post(post_id, post_tuple, is_tp):
+    """ Call appropriate executables to learn the post. """
+    pass

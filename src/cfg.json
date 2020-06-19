@@ -1,0 +1,22 @@
+{
+    "io": {
+        "dest": [
+            {
+                "path": "\\stdout//",
+                "level": "verbose"
+            },
+            {
+                "path": "all.txt",
+                "level": "verbose"
+            }
+        ]
+    },
+    "ms": {
+        "ms_host": "Metasmoke host",
+        "ws_host": "Metasmoke WebSocket host",
+        "api_key": "Metasmoke key",
+        "ws_max_retry": 1,
+        "ws_retry_sleep": 5,
+        "ws_timeout": 10
+    }
+}
