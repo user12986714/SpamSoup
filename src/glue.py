@@ -101,7 +101,7 @@ def ms_ws_listener():
                     continue
                 msg.output("Feedbacks for post {} fetched from Metasmoke HTTP API as {}.".format(post_id, feedbacks), msg.VERBOSE, tags=["HTTP", "Feedback"])
 
-                is_over_thres = ml.feedback_over_threshold(feedbacks)
+                is_over_thres = ml.feedback_over_threshold(post_id, feedbacks)
                 if is_over_thres is None:
                     # Not yet.
                     msg.output("Feedbacks for post {} are insufficient.".format(post_id), msg.DEBUG, tags=["Feedback"])
@@ -150,8 +150,7 @@ if __name__ == "__main__":
     config_ws = config["ws"]
     msg.config(config["msg"])
     msapi.config(config["msapi"])
-    # TODO: ml config
-    # ml.config(config["ml"])
+    ml.config(config["ml"])
 
     msg.output(startup_str, msg.INFO, tags=["Framework"])
     ms_ws_listener()

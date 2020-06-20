@@ -6,7 +6,7 @@
                 "level": "verbose"
             },
             {
-                "path": "all.txt",
+                "path": "verbose_log.txt",
                 "level": "verbose"
             }
         ]
@@ -18,5 +18,66 @@
         "ws_max_retry": 1,
         "ws_retry_sleep": 5,
         "ws_timeout": 10
+    },
+    "ml": {
+        "feedback": {
+            "naa_to_tp": 0.5,
+            "naa_to_fp": 0.5,
+            "un_thres": 2.0,
+            "co_thres": 3.0
+        },
+        "route": [
+            {
+                "name": "SBPH",
+                "on": true,
+                "bin": "/abs/path",
+                "type": 0,
+                "endpoint": 0,
+                "succ": [
+                    {
+                        "name": "NBC",
+                        "on": true,
+                        "bin": "/abs/path",
+                        "type": 1,
+                        "data": "/abs/data/path",
+                        "endpoint": 1
+                    }
+                ]
+            },
+            {
+                "name": "Ngram",
+                "on": true,
+                "bin": "/abs/path",
+                "type": 0,
+                "endpoint": 0,
+                "succ": [
+                    {
+                        "name": "NBC",
+                        "on": true,
+                        "bin": "/abs/path",
+                        "type": 1,
+                        "data": "/abs/data/path",
+                        "endpoint": 1
+                    }
+                ]
+            },
+            {
+                "name": "BoW",
+                "on": true,
+                "bin": "/abs/path",
+                "type": 0,
+                "endpoint": 0,
+                "succ": [
+                    {
+                        "name": "NBC",
+                        "on": true,
+                        "bin": "/abs/path",
+                        "type": 1,
+                        "data": "/abs/data/path",
+                        "endpoint": 1
+                    }
+                ]
+            }
+        ]
     }
 }

@@ -51,4 +51,14 @@ def parse(cfg_file):
     config["msapi"] = {"ms_host": cfg["ms"]["ms_host"],
                        "api_key": cfg["ms"]["api_key"]}
 
+    assert isinstance(cfg["ml"]["feedback"]["naa_to_tp"], float)
+    assert isinstance(cfg["ml"]["feedback"]["naa_to_fp"], float)
+    assert isinstance(cfg["ml"]["feedback"]["un_thres"], float)
+    assert isinstance(cfg["ml"]["feedback"]["co_thres"], float)
+
+    config["ml"] = {"feedback": {"naa_to_tp": cfg["ml"]["feedback"]["naa_to_tp"],
+                                 "naa_to_fp": cfg["ml"]["feedback"]["naa_to_fp"],
+                                 "un_thres": cfg["ml"]["feedback"]["un_thres"],
+                                 "co_thres": cfg["ml"]["feedback"]["co_thres"]}}
+
     return config
