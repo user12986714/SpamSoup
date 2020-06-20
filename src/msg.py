@@ -57,8 +57,6 @@ def rm_dest(dest_str):
 
 def output(message, level, tags=None, exclude=None):
     """ Output a message. """
-    global msg_config
-
     msg_to_output = "[{:.3f}] ".format(time.time())
 
     if tags:
@@ -82,8 +80,6 @@ def output(message, level, tags=None, exclude=None):
 
 def print_to(output_dest, msg):
     """ Print a message to a destination. """
-    global msg_config
-
     if output_dest in special_dest:
         special_dest[output_dest](msg)
         return

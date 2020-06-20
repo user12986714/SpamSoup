@@ -16,7 +16,6 @@ def config(cfg):
 def get_feedback(post_id):
     """ Get the list of feedback on post. """
     # Returns: [(uid, feedback)]
-    global ms_config
 
     route = '{}/api/v2.0/feedbacks/post/' +\
             '{}?key={}&filter=JJLFGJOFIOMFLGHJLHNIFMGJILKJKHOLMHIFGGOLFNIHF'
@@ -37,7 +36,6 @@ def get_feedback(post_id):
 def get_post(post_id):
     """ Get the post. """
     # Returns: (post_title, post_body, user_tuple)
-    global ms_config
 
     route = '{}/api/v2.0/posts/' +\
             '{}?key={}&filter=MLLKIHJMHIHKKFMJLLHGMKIMMGOKFFN'
