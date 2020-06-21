@@ -85,7 +85,7 @@ def ms_ws_listener():
                 post_tuple = (message["object"]["title"], message["object"]["body"], user)
                 msg.output("Post tuple for {} formed as {}.".format(post_id, post_tuple), msg.VERBOSE, tags=["Post"])
 
-                ml.analyze_post(post_id, post_tuple)
+                ml.exec_ml(post_id, post_tuple, None)
 
             if message["event_class"] == "Feedback":
                 # Updates on feedback. Check if over threshold.
@@ -117,7 +117,7 @@ def ms_ws_listener():
                     continue
                 msg.output("Post tuple for {} fetched from Metasmoke HTTP API as {}.".format(post_id, post_tuple), msg.VERBOSE, tags=["HTTP", "Post"])
 
-                ml.learn_post(post_id, post_tuple, is_over_thres)
+                ml.exec_ml(post_id, post_tuple, is_over_thres)
         except RuntimeError as e:
             # Severe errors
             msg.output("{}".format(e), msg.ERROR, tags=["Framework"])

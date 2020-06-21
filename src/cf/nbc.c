@@ -123,7 +123,6 @@ char bayes_classify(FILE *data_file){
         log_posterior_ratio += log_tp_count - log_fp_count - log_sample_bias;
     }
 
-    fprintf(stderr, "Log spam ratio: %Lf", log_posterior_ratio);
     if (log_posterior_ratio > 0){
         return 'T';
     }

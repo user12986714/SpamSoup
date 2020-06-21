@@ -26,55 +26,55 @@
             "un_thres": 2.0,
             "co_thres": 3.0
         },
+        "exec": {
+            "SBPH": {
+                "bin": "/abs/path",
+                "type": 0
+            },
+            "Ngram": {
+                "bin": "/abs/path",
+                "type": 0
+            },
+            "BoW": {
+                "bin": "/abs/path",
+                "type": 0
+            },
+            "NBC": {
+                "bin": "/abs/path",
+                "type": 1
+            }
+        },
         "route": [
             {
-                "name": "SBPH",
-                "on": true,
-                "bin": "/abs/path",
-                "type": 0,
-                "endpoint": 0,
+                "exec": "SBPH",
+                "endpoint": false,
                 "succ": [
                     {
-                        "name": "NBC",
-                        "on": true,
-                        "bin": "/abs/path",
-                        "type": 1,
+                        "exec": "NBC",
                         "data": "/abs/data/path",
-                        "endpoint": 1
+                        "endpoint": true
                     }
                 ]
             },
             {
-                "name": "Ngram",
-                "on": true,
-                "bin": "/abs/path",
-                "type": 0,
-                "endpoint": 0,
+                "exec": "Ngram",
+                "endpoint": false,
                 "succ": [
                     {
-                        "name": "NBC",
-                        "on": true,
-                        "bin": "/abs/path",
-                        "type": 1,
+                        "exec": "NBC",
                         "data": "/abs/data/path",
-                        "endpoint": 1
+                        "endpoint": true
                     }
                 ]
             },
             {
-                "name": "BoW",
-                "on": true,
-                "bin": "/abs/path",
-                "type": 0,
-                "endpoint": 0,
+                "exec": "BoW",
+                "endpoint": false,
                 "succ": [
                     {
-                        "name": "NBC",
-                        "on": true,
-                        "bin": "/abs/path",
-                        "type": 1,
+                        "exec": "NBC",
                         "data": "/abs/data/path",
-                        "endpoint": 1
+                        "endpoint": true
                     }
                 ]
             }
