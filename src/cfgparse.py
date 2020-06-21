@@ -3,6 +3,33 @@
 import json
 
 
+def depth_first_parser(route, exec_cfg):
+    """ Depth first parser for ml route. """
+    parsed_cfg = list()
+    for node in route:
+        parsed_node = dict()
+        assert node["exec"] in exec_cfg
+        assert isinstance(node["endpoint"], bool)
+
+        parsed_node["exec"] = node["exec"]
+        parsed_node["endpoint"] = node["endpoint"]
+
+        if exec_cfg[node["exec"]]["type"] == 1:
+            assert isinstance(node["data"], str)
+            parsed_node["data"] = node["data"]
+
+        if node["endpoint"]:
+            assert "succ" not in node
+        else:
+            assert isinstance(node["succ"], list)
+            assert node["succ"]
+            parsed_node["succ"] = depth_first_parser(node["succ"], exec_cfg)
+
+        parsed_cfg.append(parsed_node)
+
+    return parsed_cfg
+
+
 def parse(cfg_file):
     """ Parse config. """
     # There is no try-except block here, and is intended.
@@ -60,5 +87,17 @@ def parse(cfg_file):
                                  "naa_to_fp": cfg["ml"]["feedback"]["naa_to_fp"],
                                  "un_thres": cfg["ml"]["feedback"]["un_thres"],
                                  "co_thres": cfg["ml"]["feedback"]["co_thres"]}}
+
+    config["ml"]["exec"] = dict()
+    for exec_name in cfg["ml"]["exec"]:
+        assert isinstance(exec_name, str)
+        assert isinstance(cfg["ml"]["exec"][exec_name]["bin"], str)
+        assert isinstance(cfg["ml"]["exec"][exec_name]["type"], int)
+
+        config["ml"]["exec"][exec_name] = {"bin": cfg["ml"]["exec"][exec_name]["bin"],
+                                           "type": cfg["ml"]["exec"][exec_name]["type"]}
+
+    config["ml"]["route"] = list()
+    config["ml"]["route"] = depth_first_parser(cfg["ml"]["route"], config["ml"]["exec"])
 
     return config
