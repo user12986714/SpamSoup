@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
+import sys
 import time
 import json
 import websocket
@@ -138,7 +139,10 @@ def ms_ws_listener():
 
 
 if __name__ == "__main__":
-    config = cfgparse.parse("cfg.json")  # TODO: Passing cfg file location by cmd args.
+    try:
+        config = cfgpars.parse(sys.argv[1])
+    except IndexError:
+        config = cfgparse.parse("cfg.json")
 
     startup_str = "SpamSoup {major} ({alias}) started at {major}.{minor} on {user}/{inst}."
     startup_str = startup_str.format(major=ver_info["major"],
