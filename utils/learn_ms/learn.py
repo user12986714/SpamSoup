@@ -4,7 +4,8 @@
 import sys
 import math
 import pickle
-import ms
+
+import ml
 
 
 def manual_op(joined_posts, need_manual_op):
@@ -62,7 +63,7 @@ def learn():
 
     need_manual_op = list()
     for post_id in joined_posts:
-        is_over_thres = ms.feedback_over_threshold(joined_posts[post_id]["feedback"])
+        is_over_thres = ml.feedback_over_threshold(joined_posts[post_id]["feedback"])
         if is_over_thres is None:
             need_manual_op.append(post_id)
         else:
@@ -140,7 +141,7 @@ def learn():
     print("Start learning {} posts.".format(num_total_posts))
 
     for post_id in joined_posts:
-        ms.learn_post("LEARN", joined_posts[post_id]["post"], joined_posts[post_id]["tag"])
+        ml.exec_ml("LEARN", joined_posts[post_id]["post"], joined_posts[post_id]["tag"])
         num_posts_learned += 1
         if num_posts_learned % 500 == 0:
             print("{} posts out of {} learned.".format(num_posts_learned, num_total_posts))
