@@ -139,10 +139,13 @@ def ms_ws_listener():
 
 
 if __name__ == "__main__":
-    try:
-        config = cfgpars.parse(sys.argv[1])
-    except IndexError:
-        config = cfgparse.parse("cfg.json")
+    cfg_arg = [x for x in sys.argv if x.startswith("--config=")]
+    if len(cfg_arg) != 1:
+        cfg_location = "cfg.json"  # Default
+    else:
+        cfg_location = cfg_arg[0].split("=", 1)[1]
+
+    config = cfgparse.parse(cfg_location)
 
     startup_str = "SpamSoup {major} ({alias}) started at {major}.{minor} on {user}/{inst}."
     startup_str = startup_str.format(major=ver_info["major"],
