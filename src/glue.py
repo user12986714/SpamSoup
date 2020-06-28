@@ -46,6 +46,7 @@ def conn_ms_ws():
 
 def ms_ws_listener():
     """ Metasmoke websocket listener. """
+    already_learned_posts = dict()
     ws = conn_ms_ws()
     msg.output("Connected to Metasmoke WebSocket.", msg.DEBUG, tags=["WebSocket"])
     while True:
@@ -108,6 +109,13 @@ def ms_ws_listener():
                     msg.output("Feedbacks for post {} are insufficient.".format(post_id), msg.DEBUG, tags=["Feedback"])
                     continue
 
+                if post_id in already_learned_posts:
+                    if already_learned_posts[post_id] == is_over_thres:
+                        msg.output("Post {} already learned as {}.".format(post_id, "tp" if is_over_thres else "fp"), msg.DEBUG, tags=["Feedback"])
+                        continue
+                    else:
+                        msg.output("Post {} already learned as {}, but feedbacks indicate that it is {}.".format(post_id, "fp" if is_over_thres else "tp", "tp" if is_over_thres else "fp"), msg.INFO, tags=["Feedback", "Learn-incorrect"]);
+
                 msg.output("Post {} registered as {} by feedbacks.".format(post_id, "tp" if is_over_thres else "fp"), msg.INFO, tags=["Feedback"])
 
                 # Fetch post to be learned.
@@ -118,6 +126,7 @@ def ms_ws_listener():
                     continue
                 msg.output("Post tuple for {} fetched from Metasmoke HTTP API as {}.".format(post_id, post_tuple), msg.VERBOSE, tags=["HTTP", "Post"])
 
+                already_learned_posts[post_id] = is_over_thres
                 ml.exec_ml(post_id, post_tuple, is_over_thres)
         except RuntimeError as e:
             # Severe errors
