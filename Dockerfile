@@ -16,5 +16,4 @@ RUN /src/build.sh
 RUN apk del build-base
 RUN rm -rf /var/cache/apk
 
-WORKDIR /src
-CMD ["python3", "glue.py", "--config=cfg.json"]
+CMD ["python3", "./bin/glue.py", "--config=cfg.json"]
