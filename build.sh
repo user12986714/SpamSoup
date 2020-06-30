@@ -1,28 +1,19 @@
-#!/usr/bin/sh
+#!/bin/sh
+
+set -e
 
 if [ -d "bin" ]; then
     rm -rf bin
 fi
 
-mkdir bin
-mkdir bin/vc
-mkdir bin/cf
+mkdir -p bin/vc bin/cf
 
-cc src/vc/sbph.c src/vc/vcutils.c -Wall -o bin/vc/sbph
-cc src/vc/ngram.c src/vc/vcutils.c -Wall -o bin/vc/ngram
-cc src/vc/bow.c src/vc/vcutils.c -Wall -o bin/vc/bow
+for tool in vc/sbph vc/ngram vc/bow; do
+    cc src/"$tool".c src/vc/vcutils.c -Wall -o bin/"$tool"
+done
+cc src/cf/nbc.c src/cf/cfutils.c -Wall -o bin/cf/nbc
 
-cc src/cf/nbc.c src/cf/cfutils.c -lm -Wall -o bin/cf/nbc
+cp src/cfgparse.py src/dataproc.py src/glue.py src/ml.py src/msapi.py \
+   src/msg.py src/stopword.py src/verinfo.py bin/
 
-cp src/cfgparse.py bin/cfgparse.py
-cp src/dataproc.py bin/dataproc.py
-cp src/glue.py bin/glue.py
-cp src/ml.py bin/ml.py
-cp src/msapi.py bin/msapi.py
-cp src/msg.py bin/msg.py
-cp src/stopword.py bin/stopword.py
-cp src/verinfo.py bin/verinfo.py
-
-chmod +x utils/mknbcdat.sh
-
-chmod +x bin/glue.py
+chmod +x utils/mknbcdat.sh bin/glue.py
