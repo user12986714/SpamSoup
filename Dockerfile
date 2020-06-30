@@ -9,6 +9,7 @@ ADD build.sh /src/
 ADD bin /src/bin/
 ADD src /src/src/
 ADD utils /src/utils
+ADD cfg.json /src/
 
 WORKDIR /src
 RUN /src/build.sh
