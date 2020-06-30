@@ -1,0 +1,83 @@
+{
+    "io": {
+        "dest": [
+            {
+                "path": "\\stdout//",
+                "level": "verbose"
+            },
+            {
+                "path": "verbose_log.txt",
+                "level": "verbose"
+            }
+        ]
+    },
+    "ms": {
+        "ms_host": "Metasmoke host",
+        "ws_host": "Metasmoke WebSocket host",
+        "api_key": "Metasmoke key",
+        "ws_max_retry": 1,
+        "ws_retry_sleep": 5,
+        "ws_timeout": 10
+    },
+    "ml": {
+        "feedback": {
+            "naa_to_tp": 0.5,
+            "naa_to_fp": 0.5,
+            "un_thres": 2.0,
+            "co_thres": 3.0
+        },
+        "exec": {
+            "SBPH": {
+                "bin": "/abs/path",
+                "type": 0
+            },
+            "Ngram": {
+                "bin": "/abs/path",
+                "type": 0
+            },
+            "BoW": {
+                "bin": "/abs/path",
+                "type": 0
+            },
+            "NBC": {
+                "bin": "/abs/path",
+                "type": 1
+            }
+        },
+        "route": [
+            {
+                "exec": "SBPH",
+                "endpoint": false,
+                "succ": [
+                    {
+                        "exec": "NBC",
+                        "data": "/abs/data/path",
+                        "endpoint": true
+                    }
+                ]
+            },
+            {
+                "exec": "Ngram",
+                "endpoint": false,
+                "succ": [
+                    {
+                        "exec": "NBC",
+                        "data": "/abs/data/path",
+                        "endpoint": true
+                    }
+                ]
+            },
+            {
+                "exec": "BoW",
+                "endpoint": false,
+                "succ": [
+                    {
+                        "exec": "NBC",
+                        "data": "/abs/data/path",
+                        "endpoint": true
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,26 +1,28 @@
 #!/usr/bin/sh
 
-DIR="bin"
-
-if [ -d "$DIR" ]; then
-    rm -rf $DIR
+if [ -d "bin" ]; then
+    rm -rf bin
 fi
 
-mkdir $DIR
-mkdir $DIR/cf
-mkdir $DIR/vc
-mkdir $DIR/utils
+mkdir bin
+mkdir bin/vc
+mkdir bin/cf
 
-cc cf/nbc.c cf/cfutils.c -lm -Wall -o $DIR/cf/nbc
+cc src/vc/sbph.c src/vc/vcutils.c -Wall -o bin/vc/sbph
+cc src/vc/ngram.c src/vc/vcutils.c -Wall -o bin/vc/ngram
+cc src/vc/bow.c src/vc/vcutils.c -Wall -o bin/vc/bow
 
-cc vc/sbph.c vc/vcutils.c -Wall -o $DIR/vc/sbph
-cc vc/ngram.c vc/vcutils.c -Wall -o $DIR/vc/ngram
-cc vc/bow.c vc/vcutils.c -Wall -o $DIR/vc/bow
+cc src/cf/nbc.c src/cf/cfutils.c -lm -Wall -o bin/cf/nbc
 
-cp utils/mknbcdat.sh $DIR/utils/mknbcdat.sh
-cp utils/ms.py $DIR/utils/ms.py
-cp utils/config.py $DIR/utils/config.py
-cp utils/stopword.py $DIR/utils/stopword.py
+cp src/cfgparse.py bin/cfgparse.py
+cp src/dataproc.py bin/dataproc.py
+cp src/glue.py bin/glue.py
+cp src/ml.py bin/ml.py
+cp src/msapi.py bin/msapi.py
+cp src/msg.py bin/msg.py
+cp src/stopword.py bin/stopword.py
+cp src/verinfo.py bin/verinfo.py
 
-chmod +x $DIR/utils/mknbcdat.sh
-chmod +x $DIR/utils/ms.py
+chmod +x utils/mknbcdat.sh
+
+chmod +x bin/glue.py
