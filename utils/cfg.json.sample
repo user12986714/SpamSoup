@@ -28,19 +28,19 @@
         },
         "exec": {
             "SBPH": {
-                "bin": "/abs/path",
+                "bin": "/path/to/binary",
                 "type": 0
             },
             "Ngram": {
-                "bin": "/abs/path",
+                "bin": "/path/to/binary",
                 "type": 0
             },
             "BoW": {
-                "bin": "/abs/path",
+                "bin": "/path/to/binary",
                 "type": 0
             },
             "NBC": {
-                "bin": "/abs/path",
+                "bin": "/path/to/binary",
                 "type": 1
             }
         },
@@ -51,7 +51,7 @@
                 "succ": [
                     {
                         "exec": "NBC",
-                        "data": "/abs/data/path",
+                        "data": "/path/to/data/file",
                         "endpoint": true
                     }
                 ]
@@ -62,7 +62,7 @@
                 "succ": [
                     {
                         "exec": "NBC",
-                        "data": "/abs/data/path",
+                        "data": "/path/to/data/file",
                         "endpoint": true
                     }
                 ]
@@ -73,7 +73,7 @@
                 "succ": [
                     {
                         "exec": "NBC",
-                        "data": "/abs/data/path",
+                        "data": "/path/to/data/file",
                         "endpoint": true
                     }
                 ]
