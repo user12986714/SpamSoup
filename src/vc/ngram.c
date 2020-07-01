@@ -8,7 +8,7 @@
  * Please don't change the following constant unless absolutely necessary.
  * If ever changed, all documentation need to be changed correspondingly,
  * and all training effort will be destroyed. */
-#define PHRASE_PER_GROUP 5
+#define PHRASE_PER_GROUP (5)
 
 int main(){
     /* This program implements ngram, a hashing algorithm converting a list of phrase to

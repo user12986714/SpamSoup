@@ -8,8 +8,8 @@
  * If ever changed, they must satisfy the relation 2 ^ (PHRASE_PER_GROUP - 1) = OUTPUT_HASH_PER_GROUP.
  * At the same time, all documentation need to be changed correspondingly as well,
  * and all training effort will be destroyed. */
-#define PHRASE_PER_GROUP 5
-#define OUTPUT_HASH_PER_GROUP 16
+#define PHRASE_PER_GROUP (5)
+#define OUTPUT_HASH_PER_GROUP (16)
 
 void sbp_hash(uint32_t *sbph_result, uint32_t *hashes){
     /* This function converts an array of 5 uint32_t intergers to an array of 16 uint32_t integer hashes.
