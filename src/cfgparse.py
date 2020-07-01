@@ -36,7 +36,7 @@ def parse(cfg_file):
     # The program should stop and print out the traceback as
     # it won't work properly with invalid config anyway.
     with open(cfg_file, "r", encoding="utf-8") as cfg_stream:
-            cfg = json.load(cfg_stream)
+        cfg = json.load(cfg_stream)
 
     output_levels = {"VERBOSE": 0, "DEBUG": 1, "INFO": 2,
                      "WARNING": 3, "ERROR": 4, "CRITICAL": 5}
@@ -101,3 +101,15 @@ def parse(cfg_file):
     config["ml"]["route"] = depth_first_parser(cfg["ml"]["route"], config["ml"]["exec"])
 
     return config
+
+
+def parse_sw(sw_file):
+    with open(sw_file, "r", encoding="utf-8") as sw_stream:
+        sw = json.load(sw_stream)
+
+    assert isinstance(sw["wordlist"], list)
+    for word in sw["wordlist"]:
+        assert isinstance(word, str)
+
+    stopword = sw["wordlist"]
+    return stopword
