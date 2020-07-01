@@ -12,5 +12,5 @@ rescue_docker(){
 }
 
 wait_until_ready
-python3 -u ./bin/glue.py --config=cfg.json | stdbuf -o0 python3 ws_tee.py
+python3 -u ./bin/glue.py --config=cfg.json --stopword=sw.json | stdbuf -o0 python3 ws_tee.py
 rescue_docker
