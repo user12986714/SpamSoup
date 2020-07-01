@@ -2,8 +2,13 @@ The directory utils/ contains various scripts and other
 utilities that may be useful for the development, testing
 or deployment of this project.
 
+It also contains samples of various configuration files.
+
 These utilities may or may not be documented, and many of
 them are of ad hoc design, meant for one time uses.
 
-build.sh will mark all utilities that are documented as
-executable during the build process.
+All utilities that are intended for execution and are
+documented are marked executable.
+
+One should not expect active maintaince for any file in this
+directory.

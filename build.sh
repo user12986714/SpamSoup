@@ -5,15 +5,16 @@ set -e
 if [ -d "bin" ]; then
     rm -rf bin
 fi
-
 mkdir -p bin/vc bin/cf
 
-for tool in vc/sbph vc/ngram vc/bow; do
-    cc src/"$tool".c src/vc/vcutils.c -Wall -o bin/"$tool"
-done
-cc src/cf/nbc.c src/cf/cfutils.c -Wall -o bin/cf/nbc
+# Please don't try to concatenate these lines,
+# as those source code may have different dependencies
+cc src/vc/sbph.c src/vc/vcutils.c -Wall -o bin/vc/sbph
+cc src/vc/ngram.c src/vc/vcutils.c -Wall -o bin/vc/ngram
+cc src/vc/bow.c src/vc/vcutils.c -Wall -o bin/vc/bow
 
-cp src/cfgparse.py src/dataproc.py src/glue.py src/ml.py src/msapi.py \
-   src/msg.py src/stopword.py src/verinfo.py bin/
+cc src/cf/nbc.c src/cf/cfutils.c -lm -Wall -o bin/cf/nbc
 
-chmod +x utils/mknbcdat.sh bin/glue.py
+# Prepare glueware
+cp src/*.py bin/
+chmod +x bin/glue.py

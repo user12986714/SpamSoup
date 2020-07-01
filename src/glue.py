@@ -89,7 +89,7 @@ def ms_ws_listener():
                 post_id = message["object"]["id"]
                 msg.output("New post {} received from Metasmoke WebSocket.".format(post_id),
                            msg.INFO, tags=["WebSocket", "Post"])
-                
+
                 user = dataproc.get_user(message["object"]["user_link"],
                                          message["object"]["username"])
                 msg.output("Author of post {} extracted as {}.".format(post_id, user),
@@ -195,4 +195,14 @@ if __name__ == "__main__":
     ml.config(config["ml"])
 
     msg.output(startup_str, msg.INFO, tags=["Framework"])
+
+    sw_arg = [x for x in sys.argv if x.startswith("--stopword=")]
+    if len(sw_arg) == 1:
+        try:
+            sw_location = sw_arg[0].split("=", 1)[1]
+            sw = cfgparse.parse_sw(sw_location)
+            ml.config_sw(sw)
+        except Exception:
+            pass
+
     ms_ws_listener()
