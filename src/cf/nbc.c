@@ -6,14 +6,14 @@
 /* !!! Notice !!!
  * If the following constant is changed, it must be a prime.
  * At the same time, all learning data for this program need to be migrated. */
-#define FOLD_TO 8388617
+#define FOLD_TO (8388617)
 
 /* !!!!!!! IMPORTANT !!!!!!!
  * The following two constants are NOT TO BE CHANGED without original developer's review.
  * Run a git blame and find out who is responsible for this constant value.
  * Bugs guaranteed for failures in following this advice. */
-#define BYTES_PER_RECORD 4
-#define SAMPLE_COUNTER_BYTES 8
+#define BYTES_PER_RECORD (4)
+#define SAMPLE_COUNTER_BYTES (8)
 
 void bayes_learn(FILE *data_file, char category){
     /* This function increases the counter, corresponding to the category, of hashes
