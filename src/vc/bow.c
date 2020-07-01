@@ -21,7 +21,7 @@ int main(){
 
         hash_result = str_hash(phrase, (size_t)(len_phrase));
 
-        printf("%lu\n", hash_result);
+        printf(PRIu32"\n", hash_result);
     }
 
     free(phrase);

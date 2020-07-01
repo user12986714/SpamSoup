@@ -23,7 +23,7 @@ void bayes_learn(FILE *data_file, char category){
      * category shall be a char and equal to either 'T' or 'F'.
      * Outcome:
      * The corresponding counter will be increased. */
-    unsigned long hash;
+    uint32_t  hash;
     long offset, sc_offset;
     uint32_t hash_counter;
     uint64_t sample_counter;
@@ -34,7 +34,7 @@ void bayes_learn(FILE *data_file, char category){
     fseek(data_file, sc_offset, SEEK_SET);
     fread(&sample_counter, SAMPLE_COUNTER_BYTES, 1, data_file);
 
-    while (scanf("%lu", &hash) != -1){
+    while (scanf(PRIu32, &hash) != -1){
         offset = 2 * BYTES_PER_RECORD * (long)(hash % FOLD_TO);
         offset += (category == 'T') ? 0 : BYTES_PER_RECORD;
 
@@ -74,7 +74,7 @@ char bayes_classify(FILE *data_file){
      * Outcome:
      * A char will be returned that is either 'T' or 'F', representing true or false
      * positive. */
-    unsigned long hash;
+    uint32_t hash;
     long offset;
 
     uint32_t tp_count, fp_count;

@@ -64,7 +64,7 @@ int main(){
             }
 
             hash = str_hash(catphrase, len_catphrase);
-            printf("%lu\n", hash);
+            printf(PRIu32"\n", hash);
             
             free(catphrase);
         }
@@ -95,7 +95,7 @@ int main(){
             }
 
             hash = str_hash(catphrase, len_catphrase);
-            printf("%lu\n", hash);
+            printf(PRIu32"\n", hash);
             
             free(catphrase);
         }

@@ -71,7 +71,7 @@ int main(){
         }
 
         for (size_t i = 0; i < avai_hashes; i++){
-            printf("%lu\n", sbph_r[i]);
+            printf(PRIu32"\n", sbph_r[i]);
         }
     }
 
