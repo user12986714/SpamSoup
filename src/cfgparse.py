@@ -104,6 +104,7 @@ def parse(cfg_file):
 
 
 def parse_sw(sw_file):
+    """ Parse stopword config. """
     with open(sw_file, "r", encoding="utf-8") as sw_stream:
         sw = json.load(sw_stream)
 
