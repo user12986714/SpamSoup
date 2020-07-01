@@ -8,7 +8,7 @@
  * Please don't change the following constant unless absolutely necessary.
  * If ever changed, all documentation need to be changed correspondingly,
  * and all training effort will be destroyed. */
-#define PHRASE_PER_GROUP 5
+#define PHRASE_PER_GROUP (5)
 
 int main(){
     /* This program implements ngram, a hashing algorithm converting a list of phrase to
@@ -33,7 +33,7 @@ int main(){
     size_t ptr;  /* Pointer used when concatenating phrases. */
     unsigned int not_null_phrase = 0;
 
-    unsigned long hash;
+    uint32_t hash;
 
     while ((len_phrase = getline((char **)(&phrase), &size_phrase, stdin)) != -1){
         strip_endl(phrase, &len_phrase);
@@ -64,7 +64,7 @@ int main(){
             }
 
             hash = str_hash(catphrase, len_catphrase);
-            printf("%lu\n", hash);
+            printf(PRIu32"\n", hash);
             
             free(catphrase);
         }
@@ -82,26 +82,26 @@ int main(){
 
         if (not_null_phrase < PHRASE_PER_GROUP){
             len_catphrase = 0;
-            for (unsigned i = not_null_phrase; i < PHRASE_PER_GROUP; i++){
+            for (size_t i = not_null_phrase; i < PHRASE_PER_GROUP; i++){
                 len_catphrase += len_phrase_list[i] + 1;
             }
             catphrase = malloc(len_catphrase-- * sizeof(char));
 
             ptr = 0;
-            for (unsigned int i = not_null_phrase; i < PHRASE_PER_GROUP; i++){
+            for (size_t i = not_null_phrase; i < PHRASE_PER_GROUP; i++){
                 memcpy(catphrase + ptr * sizeof(char), phrase_list[i], len_phrase_list[i]);
                 ptr += len_phrase_list[i];
                 catphrase[ptr++] = '\0';
             }
 
             hash = str_hash(catphrase, len_catphrase);
-            printf("%lu\n", hash);
+            printf(PRIu32"\n", hash);
             
             free(catphrase);
         }
     }
 
-    for (unsigned int i = 0; i < PHRASE_PER_GROUP; i++){
+    for (size_t i = 0; i < PHRASE_PER_GROUP; i++){
         free(phrase_list[i]);
     }
     free(phrase);
