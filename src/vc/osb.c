@@ -44,7 +44,7 @@ int main(){
 
         for (size_t i = 1; i < (PHRASE_PER_GROUP - missing_phrases); i++){
             osb_r = (hash_r[0] << 1) + (hash_r[i] << i) + hash_r[i];
-            printf(PRIu32"\n", osb_r);
+            printf("%"PRIu32"\n", osb_r);
         }
     }
 
