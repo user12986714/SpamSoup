@@ -19,6 +19,7 @@ while :; do
     if ! git branch | grep "${DATA_BRANCH}"; then
         git checkout master
         git branch "${DATA_BRANCH}"
+        git push --set-upstream origin "${DATA_BRANCH}"
     fi
     git checkout "${DATA_BRANCH}"
     git add .
