@@ -124,6 +124,10 @@ def proc_feedbacks(splitted_feedback_loc, posts_dict):
                 continue
             line = line.rstrip()
 
+            if at_index(line, 8) != "0":
+                # Invalidated
+                skipped_feedbacks += 1
+                continue
             post_id = at_index(line, 5)
             from_user = at_index(line, 2)
             feedback_type = at_index(line, 4)
