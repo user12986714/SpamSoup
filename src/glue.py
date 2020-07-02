@@ -174,35 +174,38 @@ def ms_ws_listener():
 
 
 if __name__ == "__main__":
-    cfg_arg = [x for x in sys.argv if x.startswith("--config=")]
-    if len(cfg_arg) != 1:
-        cfg_location = "cfg.json"  # Default
-    else:
-        cfg_location = cfg_arg[0].split("=", 1)[1]
+    def split_arg(arg_prefix, default_value=None):
+        arg_list = [x for x in sys.argv if x.startswith(arg_prefix)]
+        if len(arg_list) != 1:
+            return default_value
+        else:
+            return arg_list[0].spilt("=", 1)[1]
 
+    cfg_location = split_arg("--config=", "cfg.json")
     config = cfgparse.parse(cfg_location)
-
-    startup_str = "SpamSoup {major} ({alias}) started at {major}.{minor} on {user}/{inst}."
-    startup_str = startup_str.format(major=ver_info["major"],
-                                     alias=ver_info["alias"],
-                                     minor=ver_info["minor"],
-                                     user=ver_info["user"],
-                                     inst=ver_info["inst"])
-
     config_ws = config["ws"]
     msg.config(config["msg"])
     msapi.config(config["msapi"])
     ml.config(config["ml"])
 
-    msg.output(startup_str, msg.INFO, tags=["Framework"])
-
-    sw_arg = [x for x in sys.argv if x.startswith("--stopword=")]
-    if len(sw_arg) == 1:
+    sw_location = split_arg("--stopword=")
+    if sw_location:
         try:
-            sw_location = sw_arg[0].split("=", 1)[1]
             sw = cfgparse.parse_sw(sw_location)
             ml.config_sw(sw)
         except Exception:
             pass
+
+    user_str = split_arg("--user=", "unknown_user")
+    inst_str = split_arg("--inst=", "unknown_inst")
+
+    startup_str = "SpamSoup {major} ({alias}) started at" +\
+                  " {major}.{minor} on {user}/{inst}."
+    startup_str = startup_str.format(major=ver_info["major"],
+                                     alias=ver_info["alias"],
+                                     minor=ver_info["minor"],
+                                     user=user_str,
+                                     inst=inst_str)
+    msg.output(startup_str, msg.INFO, tags=["Framework"])
 
     ms_ws_listener()

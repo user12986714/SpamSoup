@@ -3,6 +3,12 @@
 ON_BRANCH="prod"
 DATA_BRANCH="instance-name"
 
+CFG_AT="config-json-location"
+SW_AT="stopword-json-location"
+
+USER_STR="user-name"
+INST_STR="inst-name"
+
 wait_until_ready(){
     while ! [ -f "READY" ]; do
         sleep 5
@@ -32,6 +38,6 @@ upload_data(){
 wait_until_ready
 while :; do
     build_new
-    python3 -u ./bin/glue.py --config=cfg.json --stopword=sw.json | stdbuf -o0 python3 ws_tee.py
+    python3 -u ./bin/glue.py "--config=${CFG_AT}" "--stopword=${SW_AT}" "--user=${USER_STR}" "--inst=${INST_STR}" | stdbuf -o0 python3 ws_tee.py
     upload_data
 done
