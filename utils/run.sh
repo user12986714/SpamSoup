@@ -9,12 +9,13 @@ wait_until_ready(){
     done
 }
 
-wait_until_ready
-while :; do
+build_new(){
     git pull upstream "${ON_BRANCH}"
     git checkout "${ON_BRANCH}"
     sh build.sh
-    python3 -u ./bin/glue.py --config=cfg.json --stopword=sw.json | stdbuf -o0 python3 ws_tee.py
+}
+
+upload_data(){
     cd data
     if ! git branch | grep "${DATA_BRANCH}"; then
         git checkout master
@@ -26,4 +27,11 @@ while :; do
     git commit -m "$(date +%s)"
     git push
     cd ..
+}
+
+wait_until_ready
+while :; do
+    build_new
+    python3 -u ./bin/glue.py --config=cfg.json --stopword=sw.json | stdbuf -o0 python3 ws_tee.py
+    upload_data
 done
