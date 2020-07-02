@@ -34,7 +34,7 @@ void bayes_learn(FILE *data_file, char category){
     fseek(data_file, sc_offset, SEEK_SET);
     fread(&sample_counter, SAMPLE_COUNTER_BYTES, 1, data_file);
 
-    while (scanf(PRIu32, &hash) != -1){
+    while (scanf("%"PRIu32, &hash) != -1){
         offset = 2 * BYTES_PER_RECORD * (long)(hash % FOLD_TO);
         offset += (category == 'T') ? 0 : BYTES_PER_RECORD;
 
@@ -53,7 +53,7 @@ void bayes_learn(FILE *data_file, char category){
             fwrite(&hash_counter, BYTES_PER_RECORD, 1, data_file);
         }
         else{
-            fprintf(stderr, "Hash %lu as %c counter overflowed.\n", hash, category);
+            fprintf(stderr, "Hash %"PRIu32" as %c counter overflowed.\n", hash, category);
         }
     }
 
@@ -107,7 +107,7 @@ char bayes_classify(FILE *data_file){
     log_posterior_ratio = log_sample_bias;
 #endif
 
-    while (scanf("%lu", &hash) != -1){
+    while (scanf("%"PRIu32, &hash) != -1){
         offset = 2 * BYTES_PER_RECORD * (long)(hash % FOLD_TO);
 
         fseek(data_file, offset, SEEK_SET);
