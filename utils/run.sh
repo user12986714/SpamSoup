@@ -17,7 +17,7 @@ build_new(){
 
 upload_data(){
     cd data
-    if ! git branch | grep "${DATA_BRANCH}"; then
+    if ! git branch | grep "${DATA_BRANCH}" > /dev/null; then
         git checkout master
         git branch "${DATA_BRANCH}"
         git push --set-upstream origin "${DATA_BRANCH}"
