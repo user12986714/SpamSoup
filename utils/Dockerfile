@@ -11,6 +11,7 @@ ADD src /src/src/
 ADD data /src/data/
 ADD cfg.json /src/
 ADD sw.json /src/
+ADD ws_tee.py /src
 
 WORKDIR /src
 CMD ["sh", "run.sh"]
