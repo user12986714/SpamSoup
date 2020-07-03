@@ -15,12 +15,6 @@ wait_until_ready(){
     done
 }
 
-build_new(){
-    git pull upstream "${ON_BRANCH}"
-    git checkout "${ON_BRANCH}"
-    sh build.sh
-}
-
 upload_data(){
     cd data
     if ! git branch | grep "${DATA_BRANCH}" > /dev/null; then
@@ -37,7 +31,6 @@ upload_data(){
 
 wait_until_ready
 while :; do
-    build_new
     python3 -u ./bin/glue.py "--config=${CFG_AT}" "--stopword=${SW_AT}" "--user=${USER_STR}" "--inst=${INST_STR}" | stdbuf -o0 python3 ws_tee.py
     upload_data
 done

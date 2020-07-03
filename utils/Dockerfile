@@ -16,4 +16,8 @@ ADD sw.json /src/
 ADD ws_tee.py /src
 
 WORKDIR /src
+RUN sh build.sh
+RUN apk del build-base
+RUN rm -rf /var/cache/apk
+
 CMD ["sh", "run.sh"]
