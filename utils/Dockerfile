@@ -1,6 +1,7 @@
 FROM frolvlad/alpine-python3:latest
 
 RUN apk add --no-cache build-base
+RUN apk add --no-cache coreutils
 #RUN adduser -D spamsoup
 RUN pip install requests websocket-client SimpleWebSocketServer
 RUN mkdir -p /src/bin /src/src /src/data
