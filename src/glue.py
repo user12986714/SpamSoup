@@ -179,7 +179,7 @@ if __name__ == "__main__":
         if len(arg_list) != 1:
             return default_value
         else:
-            return arg_list[0].spilt("=", 1)[1]
+            return arg_list[0].split("=", 1)[1]
 
     cfg_location = split_arg("--config=", "cfg.json")
     config = cfgparse.parse(cfg_location)
