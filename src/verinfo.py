@@ -2,4 +2,4 @@
 
 ver_info = {"major": 1,
             "alias": "Config",
-            "minor": 1}
+            "minor": 2}
