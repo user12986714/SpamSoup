@@ -23,7 +23,7 @@ void bayes_learn(FILE *data_file, char category){
      * category shall be a char and equal to either 'T' or 'F'.
      * Outcome:
      * The corresponding counter will be increased. */
-    uint32_t  hash;
+    uint32_t hash;
     long offset, sc_offset;
     uint32_t hash_counter;
     uint64_t sample_counter;
@@ -66,7 +66,7 @@ void bayes_learn(FILE *data_file, char category){
     return;
 }
 
-char bayes_classify(FILE *data_file){
+long double bayes_classify(FILE *data_file){
     /* This function performs Bayesian classification on the group of hashes inputted
      * from stdin, using the learned data in the specified dat file.
      * Arguments:
@@ -123,12 +123,7 @@ char bayes_classify(FILE *data_file){
         log_posterior_ratio += log_tp_count - log_fp_count - log_sample_bias;
     }
 
-    if (log_posterior_ratio > 0){
-        return 'T';
-    }
-    else{
-        return 'F';
-    }
+    return log_posterior_ratio;
 }
 
 int main(int argc, char *argv[]){
@@ -141,7 +136,12 @@ int main(int argc, char *argv[]){
      * by a base 10 integer, and shall be in the range [0, 2 ^ 32 - 1].
      * An EOF signal shall be sent when input ends.
      * Output format:
-     * Output consist one line, with one char on each line. The char is either 'T' or 'F'.
+     * Output consist one line.
+     * If the classifier is learning, the format is "%c". "%c" is 'T' if the post is learned as
+     * true positive, or 'F' otherwise.
+     * If the classifier is classifying, the format "%c (%lf)". "%c" is 'T' if the post is classified
+     * as true positive, or 'F' otherwise. "%lf" is a long double equal to the base 2 logarithm
+     * of the fraction true positive probability over false positive probability.
      * Arguments:
      * Two arguments shall be passed via command line.
      * The first shall be either "--learn" or "--classify".
@@ -156,6 +156,7 @@ int main(int argc, char *argv[]){
      * the path, absolute or relative, to a valid data file this program uses to store learning
      * result. This arguments instruct this program what data file to use for learning and classfying. */
     char category;
+    long double log_posterior_ratio;
     FILE *data_file;
 
     /* Following magic numbers are from program specifiation. */
@@ -163,13 +164,13 @@ int main(int argc, char *argv[]){
         category = argv[1][8];
         data_file = fopen(&(argv[2][7]), "r+b");
         bayes_learn(data_file, category);
+        printf("%c\n", category);
     }
     else{
         data_file = fopen(&(argv[2][7]), "rb");
-        category = bayes_classify(data_file);
+        log_posterior_ratio = bayes_classify(data_file);
+        printf("%c (%lf)\n", ((log_posterior_ratio > 0) ? 'T' : 'F'), log_posterior_ratio);
     }
-
-    printf("%c\n", category);
 
     fclose(data_file);
     return 0;
