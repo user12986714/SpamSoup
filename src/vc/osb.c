@@ -21,7 +21,7 @@ int main(){
      * Output consists many lines, with one hash on each line. Each hasah is represented by a base 10 interger.
      * For first four lines of input, there will be i - 1 output lines for i-th input line.
      * For later lines, there will be 4 output lines for each input line. */
-    unsigned char *phrase;
+    unsigned char *phrase = NULL;
     size_t size_phrase = 0;
     ssize_t len_phrase;
     uint32_t hash_r[PHRASE_PER_GROUP] = {0};

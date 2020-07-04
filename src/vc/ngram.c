@@ -21,7 +21,7 @@ int main(){
      * Output consists many lines, with one hash on each line. Each hash is represented by a base 10 integer.
      * The number of lines in the output is 4 lines less than that of input. If input is less that 5 lines
      * but greater than 0 line, output is 1 line. An EOF signal will be sent when output ends. */
-    unsigned char *phrase;
+    unsigned char *phrase = NULL;
     size_t size_phrase = 0;
     ssize_t len_phrase;
 
