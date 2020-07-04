@@ -42,4 +42,4 @@ class Version:
     # Please don't change any value in this class when configuring.
     major = 0
     alias = "Unsure"
-    minor = 1
+    minor = 2

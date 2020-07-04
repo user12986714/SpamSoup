@@ -11,7 +11,7 @@ int main(){
      * Output format:
      * Output consists many lines, with one hash on each line. Each hash is represented by a base 10 integer.
      * The number of lines in the output is the same as that of input. An EOF signal will be sent when output ends. */
-    unsigned char *phrase;
+    unsigned char *phrase = NULL;
     size_t size_phrase = 0;
     ssize_t len_phrase;
     unsigned long hash_result;
