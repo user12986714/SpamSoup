@@ -4,6 +4,7 @@
 import sys
 import time
 import json
+import traceback
 import websocket
 
 from verinfo import ver_info
@@ -154,15 +155,16 @@ def ms_ws_listener():
                 ml.exec_ml(post_id, post_tuple, is_over_thres)
         except RuntimeError as e:
             # Severe errors
-            msg.output("{}".format(e), msg.ERROR, tags=["Framework"])
-            raise
+            msg.output("{}: {}".format(type(e).__name__, e), msg.ERROR, tags=["Framework"])
+            raise  # No need to print traceback as it is raised again
         except KeyboardInterrupt:
             msg.output("User enforced program termination.",
                        msg.DEBUG, tags=["Framework"])
             ws.close()
             return None
         except Exception as e:
-            msg.output("{}".format(e), msg.WARNING, tags=["Framework"])
+            msg.output("{}: {}".format(type(e).__name__, e), msg.WARNING, tags=["Framework"])
+            msg.output(traceback.format_exc(), msg.VERBOSE, tags=["Framework", "Traceback"])
             # Reconnect.
             try:
                 ws.close()
