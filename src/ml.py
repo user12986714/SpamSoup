@@ -4,10 +4,10 @@ import re
 import subprocess
 
 import msg
-from stopword import stopword
 
 
 ml_config = None
+sw_config = list()
 
 
 def config(cfg):
@@ -16,13 +16,18 @@ def config(cfg):
     ml_config = cfg
 
 
+def config_sw(sw):
+    global sw_config
+    sw_config = sw
+
+
 def tokenize_string(string):
     """ Split a string into tokens. """
     # Argument: string
     # Returns: a list of tokens
 
     tokens = re.compile(r"[-\w']+").findall(string.lower())
-    return [tokens[i] for i in range(len(tokens)) if tokens[i] not in stopword]
+    return [token for token in tokens if token not in sw_config]
 
 
 def naive_tokenizer(post_tuple):

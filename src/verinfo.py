@@ -1,7 +1,5 @@
 # coding=utf-8
 
-ver_info = {"major": 0,
-            "alias": "",
-            "minor": 0,
-            "user": "",
-            "inst": ""}
+ver_info = {"major": 1,
+            "alias": "Config",
+            "minor": 0}
