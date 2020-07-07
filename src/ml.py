@@ -103,10 +103,10 @@ def depth_first_exec(post_id, output_prefix, route, is_tp, prev_output):
         pass
     elif exec_info["type"] == 1:
         if is_tp is None:
-            bin_with_args.append("--classify")
+            bin_with_args.append("C")
         else:
-            bin_with_args.append("--learn={}".format("T" if is_tp else "F"))
-        bin_with_args.append("--data={}".format(route["data"]))
+            bin_with_args.append("{}".format("T" if is_tp else "F"))
+        bin_with_args.append("{}".format(route["data"]))
 
     proc = subprocess.Popen(bin_with_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out_and_err = proc.communicate(input=prev_output)
