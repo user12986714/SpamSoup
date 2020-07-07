@@ -13,6 +13,7 @@ cc src/vc/sbph.c src/vc/vcutils.c -Wall -o bin/vc/sbph
 cc src/vc/ngram.c src/vc/vcutils.c -Wall -o bin/vc/ngram
 cc src/vc/bow.c src/vc/vcutils.c -Wall -o bin/vc/bow
 cc src/vc/osb.c src/vc/vcutils.c -Wall -o bin/vc/osb
+cc src/vc/sbphmh.c src/vc/vcutils.c -Wall -o bin/vc/sbphmh
 
 cc src/cf/nbc.c src/cf/cfutils.c -lm -Wall -o bin/cf/nbc
 
