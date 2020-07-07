@@ -169,7 +169,7 @@ int main(int argc, char *argv[]){
     else{
         data_file = fopen(&(argv[2][7]), "rb");
         log_posterior_ratio = bayes_classify(data_file);
-        printf("%c (%lf)\n", ((log_posterior_ratio > 0) ? 'T' : 'F'), log_posterior_ratio);
+        printf("%c (%Lf)\n", ((log_posterior_ratio > 0) ? 'T' : 'F'), log_posterior_ratio);
     }
 
     fclose(data_file);
