@@ -103,6 +103,9 @@ int main(int argc, char *argv[]){
             if ((log_weight * (1 - 2 * !!(argv[1][0] == 'f'))) < LOG_LEARN_THRES){
                 printf("LEARN\n");
             }
+            else{
+                printf("NOLEARN (%Lf)\n", log_weight);
+            }
         }
         else{
             printf("%c (%Lf)\n", ((log_weight > 0) ? 'T' : 'F'), log_weight);
