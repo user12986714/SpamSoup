@@ -15,7 +15,7 @@
 #define LOG_LEARN_THRES (0.15)
 #endif
 
-void winnow1_learn(FILE *data_file, uint8_t category){
+void winnow_learn(FILE *data_file, uint8_t category){
     uint32_t hash;
     long offset;
 
@@ -50,7 +50,7 @@ void winnow1_learn(FILE *data_file, uint8_t category){
     return;
 }
 
-long double winnow1_classify(FILE *data_file){
+long double winnow_classify(FILE *data_file){
     uint32_t hash;
     long offset;
 
@@ -96,12 +96,12 @@ int main(int argc, char *argv[]){
 
     if ((argv[1][0] == 'T') || (argv[1][0] == 'F')){
         data_file = fopen(argv[2], "r+b");
-        winnow1_learn(data_file, !!(argv[1][0] == 'F'));
+        winnow_learn(data_file, !!(argv[1][0] == 'F'));
         printf("%c\n", argv[1][0]);
     }
     else{
         data_file = fopen(argv[2], "rb");
-        log_weight = winnow1_classify(data_file);
+        log_weight = winnow_classify(data_file);
         if ((argv[1][0] == 't') || (argv[1][0] == 'f')){
             if ((log_weight * (1 - 2 * !!(argv[1][0] == 'f'))) < LOG_LEARN_THRES){
                 printf("LEARN\n");
