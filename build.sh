@@ -15,7 +15,8 @@ cc src/vc/bow.c src/vc/vcutils.c -Wall -o bin/vc/bow
 cc src/vc/osb.c src/vc/vcutils.c -Wall -o bin/vc/osb
 cc src/vc/sbphmh.c src/vc/vcutils.c -Wall -o bin/vc/sbphmh
 
-cc src/cf/nbc.c src/cf/cfutils.c -lm -Wall -o bin/cf/nbc
+cc src/cf/nbc.c -lm -Wall -o bin/cf/nbc
+cc src/cf/winnow.c -lm -Wall -o bin/cf/winnow
 
 # Prepare glueware
 cp src/*.py bin/
