@@ -88,6 +88,9 @@ long double winnow1_classify(FILE *data_file){
 }
 
 int main(int argc, char *argv[]){
+    /* Type 2 executable.
+     * Input: list of uint32_t representable integers in base 10.
+     * Output: endpoint. */
     long double log_weight;
     FILE *data_file;
 

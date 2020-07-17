@@ -127,31 +127,9 @@ long double bayes_classify(FILE *data_file){
 }
 
 int main(int argc, char *argv[]){
-    /* This program implements naive Bayesian classifier, a classification algorithm classifying
-     * a group of hash to certain categories.
-     * In this implementation, a group of hash will be classified as either true positive or
-     * false positive.
-     * Input format:
-     * Input may consist many lines, with one hash on each line. Each hash shall be represented
-     * by a base 10 integer, and shall be in the range [0, 2 ^ 32 - 1].
-     * An EOF signal shall be sent when input ends.
-     * Output format:
-     * Output consist one line.
-     * If the classifier is learning, the format is "%c". "%c" is 'T' if the post is learned as
-     * true positive, or 'F' otherwise.
-     * If the classifier is classifying, the format "%c (%Lf)". "%c" is 'T' if the post is classified
-     * as true positive, or 'F' otherwise. "%Lf" is a long double equal to the base 2 logarithm
-     * of the fraction true positive probability over false positive probability.
-     * Arguments:
-     * Two arguments shall be passed via command line.
-     * The first shall be a single character.
-     * 'T' instructs this program to learn the group of hashes as a true postive, and 'F' instructs this
-     * program to learn the group of hashes as a false positive. In both case, the output will be the
-     * same as what this program is instructed to learn. Any other character instructs this program to
-     * classify the group of hashes as either true positive or false positive. The output will be
-     * what this program classifies the group of hashes.
-     * The second shall be a string to the path of the data file, absolute or relative, which will be used
-     * to store learning result or as the data for classifying. */
+    /* Type 1 executable.
+     * Input: list of uint32_t representable integers in base 10.
+     * Output: endpoint. */
     long double log_posterior_ratio;
     FILE *data_file;
 
