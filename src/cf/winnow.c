@@ -16,6 +16,16 @@
 #endif
 
 void winnow_learn(FILE *data_file, uint8_t category){
+    /* This function, depending on what category is, adjusts the corresponding
+     * counters to the input.
+     * If category is 1, or the post is a false positive, those counters are
+     * all set to 0;
+     * otherwise they are increased by 1.
+     * Arguments:
+     * data_file shall be a FILE pointer opened as "r+b".
+     * category shall be either 1, if is false positive, or 0 otherwise.
+     * Outcome:
+     * Corresponding counters will be adjusted. */
     uint32_t hash;
     long offset;
 
@@ -51,6 +61,11 @@ void winnow_learn(FILE *data_file, uint8_t category){
 }
 
 long double winnow_classify(FILE *data_file){
+    /* This function calculates the weight of a post with the data file provided.
+     * Arguments:
+     * data_file shall be a FILE pointer opened as "rb".
+     * Outcome:
+     * A long double will be returned representing the confidence of the classification. */
     uint32_t hash;
     long offset;
 
