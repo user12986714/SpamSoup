@@ -14,7 +14,7 @@ def depth_first_parser(route, exec_cfg):
         parsed_node["exec"] = node["exec"]
         parsed_node["endpoint"] = node["endpoint"]
 
-        if exec_cfg[node["exec"]]["type"] == 1:
+        if exec_cfg[node["exec"]]["type"] in {1, 2}:  # Same format
             assert isinstance(node["data"], str)
             parsed_node["data"] = node["data"]
 

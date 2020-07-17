@@ -35,7 +35,8 @@ def conn_ms_ws():
             ws.settimeout(config_ws["timeout"])
             return ws
         except Exception as e:
-            msg.output(str(e), msg.WARNING, tags=["WebSocket"])
+            msg.output("{}: {}".format(type(e).__name__, e), msg.WARNING, tags=["WebSocket"])
+            msg.output(traceback.format_exc(), msg.VERBOSE, tags=["WebSocket", "Traceback"])
             failure_count += 1
             if config_ws["max_retry"] > -1:  # -1 is unlimited.
                 if failure_count > config_ws["max_retry"]:
@@ -113,8 +114,9 @@ def ms_ws_listener():
 
                 try:
                     feedbacks = msapi.get_feedback(post_id)
-                except ValueError as e:
-                    msg.output("{}".format(e), msg.WARNING, tags=["HTTP", "Feedback"])
+                except Exception as e:
+                    msg.output("{}: {}".format(type(e).__name__, e), msg.WARNING, tags=["HTTP", "Feedback"])
+                    msg.output(traceback.format_exc(), msg.VERBOSE, tags=["HTTP", "Feedback", "Traceback"])
                     continue
                 msg.output("Feedbacks for post {} fetched from Metasmoke HTTP API as {}.".format(post_id, feedbacks),
                            msg.VERBOSE, tags=["HTTP", "Feedback"])
