@@ -20,7 +20,7 @@ void bayes_learn(FILE *data_file, uint8_t category){
      * inputted from stdin in the specified data file.
      * Arguments:
      * data_file shall be a FILE pointer opened as "r+b".
-     * category shall be a char and equal to either 'T' or 'F'.
+     * category shall be either 1, if is false positive, or 0 otherwise.
      * Outcome:
      * The corresponding counter will be increased. */
     uint32_t hash;
@@ -72,8 +72,7 @@ long double bayes_classify(FILE *data_file){
      * Arguments:
      * data_file shall be a FILE pointer opened as "rb".
      * Outcome:
-     * A char will be returned that is either 'T' or 'F', representing true or false
-     * positive. */
+     * A long double will be returned representing the confidence of the classification. */
     uint32_t hash;
     long offset;
 
