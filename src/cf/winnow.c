@@ -8,7 +8,7 @@
 #define BYTES_PER_RECORD (1)
 
 #ifndef THRES
-#define THRES (2147483648)  /* 2 ^ 31 */
+#define THRES (2147483649)  /* 2 ^ 31 + 1 */
 #endif
 
 #ifndef LOG_LEARN_THRES
@@ -74,7 +74,7 @@ long double winnow_classify(FILE *data_file){
 
     uint64_t total_score;
 
-    total_score = 0;
+    total_score = 1;
     while (scanf("%"PRIu32, &hash) != -1){
         offset = BYTES_PER_RECORD * (long)(hash % FOLD_TO);
 
@@ -99,7 +99,7 @@ long double winnow_classify(FILE *data_file){
     }
 
     /* Prevent -inf */
-    return (total_score) ? (log2l((long double)(total_score) / (long double)(THRES))) : (-LDBL_MAX);
+    return log2l((long double)(total_score) / (long double)(THRES));
 }
 
 int main(int argc, char *argv[]){
