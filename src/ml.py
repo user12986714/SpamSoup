@@ -35,7 +35,8 @@ def naive_tokenizer(post_tuple):
     # Argument: the tuple returned by get_post() or ms_ws_listener()
     # Returns: tokenized string list
 
-    unified_user_site_id = "##USR## " + post_tuple[2][1] + " ::@:: " + post_tuple[2][0]
+    unified_user_site_id = "##USR## " + post_tuple[2][1] + \
+                           " ::@:: " + post_tuple[2][0]
     tokenized_post = list()
 
     tokenized_post.append(unified_user_site_id)
@@ -68,13 +69,23 @@ def feedback_over_threshold(post_id, feedbacks):
             naa_count += 1
             continue
 
-        msg.output("Feedback {} by {} on post {} not recognized.".format(feedback, user, post_id), msg.DEBUG, tags=["Feedback"])
+        msg.output("Feedback {} by {} on post {} not recognized.".format(feedback,
+                                                                         user,
+                                                                         post_id),
+                   msg.DEBUG, tags=["Feedback"])
 
-    msg.output("Feedback for post {} extracted as {}/{}/{}.".format(post_id, tp_count, fp_count, naa_count), msg.VERBOSE, tags=["Feedback"])
+    msg.output("Feedback for post {} extracted as {}/{}/{}.".format(post_id,
+                                                                    tp_count,
+                                                                    fp_count,
+                                                                    naa_count),
+               msg.VERBOSE, tags=["Feedback"])
 
     w_tp = tp_count + ml_config["feedback"]["naa_to_tp"] * naa_count
     w_fp = fp_count + ml_config["feedback"]["naa_to_fp"] * naa_count
-    msg.output("Weighed feedback for post {} calculated as {}/{}.".format(post_id, w_tp, w_fp), msg.VERBOSE, tags=["Feedback"])
+    msg.output("Weighed feedback for post {} calculated as {}/{}.".format(post_id,
+                                                                          w_tp,
+                                                                          w_fp),
+               msg.VERBOSE, tags=["Feedback"])
 
     if w_fp == 0 and w_tp >= ml_config["feedback"]["un_thres"]:
         return True
@@ -91,38 +102,78 @@ def feedback_over_threshold(post_id, feedbacks):
     return None
 
 
+def call(bin_with_args, stdin_bytes):
+    """ Execute the binary and return (stdout, stderr). """
+    proc = subprocess.Popen(bin_with_args,
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    return proc.communicate(input=stdin_bytes)
+
+
 def depth_first_exec(post_id, output_prefix, route, is_tp, prev_output):
     """ Perform depth first search on the route tree. """
-    # Pass None for is_tp if classfying, True if learn as tp and False if learn as fp.
+    # Pass None for is_tp if classfying,
+    # True if learn as tp and False if learn as fp.
 
     output_prefix += "-" + route["exec"]
     exec_info = ml_config["exec"][route["exec"]]
 
     bin_with_args = [exec_info["bin"]]
+    out_and_err = None
     if exec_info["type"] == 0:
-        pass
+        out_and_err = call(bin_with_args, prev_output)
     elif exec_info["type"] == 1:
         if is_tp is None:
-            bin_with_args.append("--classify")
+            bin_with_args.append("C")
         else:
-            bin_with_args.append("--learn={}".format("T" if is_tp else "F"))
-        bin_with_args.append("--data={}".format(route["data"]))
-
-    proc = subprocess.Popen(bin_with_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out_and_err = proc.communicate(input=prev_output)
+            bin_with_args.append("{}".format("T" if is_tp else "F"))
+        bin_with_args.append("{}".format(route["data"]))
+        out_and_err = call(bin_with_args, prev_output)
+    elif exec_info["type"] == 2:
+        if is_tp is None:
+            bin_with_args.append("C")
+            bin_with_args.append("{}".format(route["data"]))
+            out_and_err = call(bin_with_args, prev_output)
+        else:
+            bin_with_args.append("t" if is_tp else "f")
+            bin_with_args.append("{}".format(route["data"]))
+            out_and_err = call(bin_with_args, prev_output)
+            if not out_and_err[1]:
+                # If out_and_err[1], pass to the handler outside this if block;
+                # Proceed to the next learning stage otherwise.
+                try:
+                    if out_and_err[0].decode("utf-8").rstrip() == "LEARN":
+                        # Change "t" or "f" to "T" or "F"
+                        bin_with_args[1] = bin_with_args[1].upper()
+                        out_and_err = call(bin_with_args, prev_output)
+                except Exception as e:
+                    # Fake out_and_err
+                    out_and_err = (out_and_err[0],
+                                   "In ml.py, depth_first_exec(): {}: {}".format(type(e).__name__, e))
 
     if out_and_err[1]:
-        err_msg = "Errors occured when {}ing post {}: {}".format("classify" if is_tp is None else "learn", post_id, out_and_err[1].decode("utf-8").rstrip())
-        msg.output(err_msg, msg.WARNING, tags=["Classify" if is_tp is None else "Learn", output_prefix])
+        err_msg = "Errors occured when {}ing post {}: {}".format("classify" if is_tp is None else "learn",
+                                                                 post_id,
+                                                                 out_and_err[1].decode("utf-8").rstrip())
+        msg.output(err_msg, msg.WARNING,
+                   tags=["Classify" if is_tp is None else "Learn",
+                         output_prefix])
         return  # Terminate this route
 
     if route["endpoint"]:
-        out_msg = "Post {} {}: {}".format(post_id, "classified" if is_tp is None else "learned", out_and_err[0].decode("utf-8").rstrip())
-        msg.output(out_msg, msg.INFO if is_tp is None else msg.DEBUG, tags=["Classify" if is_tp is None else "Learn", output_prefix])
+        out_msg = "Post {} {}: {}".format(post_id,
+                                          "classified" if is_tp is None else "learned",
+                                          out_and_err[0].decode("utf-8").rstrip())
+        msg.output(out_msg,
+                   msg.INFO if is_tp is None else msg.DEBUG,
+                   tags=["Classify" if is_tp is None else "Learn",
+                         output_prefix])
         return
 
     for subroute in route["succ"]:
-        depth_first_exec(post_id, output_prefix, subroute, is_tp, out_and_err[0])
+        depth_first_exec(post_id, output_prefix,
+                         subroute, is_tp, out_and_err[0])
 
 
 def exec_ml(post_id, post_tuple, is_tp):
