@@ -40,7 +40,7 @@ void winnow_learn_mr(FILE *data_file, uint8_t category){
             continue;
         }
 
-        if (category){  /* 'F' */
+        if (category){  /* 'T' */
             current_record = 0;
             fseek(data_file, offset, SEEK_SET);
             fwrite(&current_record, BYTES_PER_RECORD, 1, data_file);
@@ -97,6 +97,8 @@ long double winnow_classify_mr(FILE *data_file){
         total_score += current_score;
     }
 
+    /* Negative sign as the larger total_score is, the more likely
+     * the post is not true positive, as the learning is reversed. */
     return -log2l((long double)(total_score) / (long double)(THRES));
 }
 
