@@ -150,7 +150,7 @@ def depth_first_exec(post_id, output_prefix, route, is_tp, prev_output):
                 except Exception as e:
                     # Fake out_and_err
                     out_and_err = (out_and_err[0],
-                                   "In ml.py, depth_first_exec(): {}: {}".format(type(e).__name__, e))
+                                   "In ml.py, depth_first_exec(): {}: {}".format(type(e).__name__, e).encode("utf-8"))
 
     if out_and_err[1]:
         err_msg = "Errors occured when {}ing post {}: {}".format("classify" if is_tp is None else "learn",
