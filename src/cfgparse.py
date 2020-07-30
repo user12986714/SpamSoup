@@ -1,29 +1,34 @@
 # coding=utf-8
 
 import json
+import verinfo
 
 
-def depth_first_parser(route, exec_cfg):
+def resolve_path(base, path):
+    """ Resolve (some) relative path. """
+    if path[0] == "/":
+        # Absolute path
+        return path
+    return base + path
+
+
+def depth_first_parser(data_base, route, exec_cfg):
     """ Depth first parser for ml route. """
     parsed_cfg = list()
     for node in route:
         parsed_node = dict()
         assert node["exec"] in exec_cfg
-        assert isinstance(node["endpoint"], bool)
 
         parsed_node["exec"] = node["exec"]
-        parsed_node["endpoint"] = node["endpoint"]
 
         if exec_cfg[node["exec"]]["type"] in {1, 2}:  # Same format
             assert isinstance(node["data"], str)
-            parsed_node["data"] = node["data"]
+            parsed_node["data"] = resolve_path(data_base, node["data"])
 
-        if node["endpoint"]:
-            assert "succ" not in node
-        else:
+        if "succ" in node:
             assert isinstance(node["succ"], list)
             assert node["succ"]
-            parsed_node["succ"] = depth_first_parser(node["succ"], exec_cfg)
+            parsed_node["succ"] = depth_first_parser(data_base, node["succ"], exec_cfg)
 
         parsed_cfg.append(parsed_node)
 
@@ -37,6 +42,33 @@ def parse(cfg_file):
     # it won't work properly with invalid config anyway.
     with open(cfg_file, "r", encoding="utf-8") as cfg_stream:
         cfg = json.load(cfg_stream)
+
+    if "general" not in cfg:
+        bin_base = ""
+        data_base = ""
+        print("The old config format is deprecated. Support will be removed in version 3.")
+    else:
+        assert isinstance(cfg["general"]["ver"], int)
+        cfg_ver = cfg["general"]["ver"]
+        if cfg_ver < verinfo.cfg_ver_min:
+            err_msg = "Config format is no longer supported. Min support version: {}; active version: {}"
+            err_msg = err_msg.format(verinfo.cfg_ver_min, verinfo.cfg_ver_active)
+            print(err_msg)
+            raise RuntimeError(err_msg)
+
+        if cfg_ver < verinfo.cfg_ver_active:
+            print("Config format is deprecated. Active version: {}".format(verinfo.cfg_ver_active))
+
+        if "bin_base" in cfg["general"]:
+            assert isinstance(cfg["general"]["bin_base"], str)
+            bin_base = cfg["general"]["bin_base"]
+            if bin_base[-1] != "/":
+                bin_base += "/"
+        if "data_base" in cfg["general"]:
+            assert isinstance(cfg["general"]["data_base"], str)
+            data_base = cfg["general"]["data_base"]
+            if data_base[-1] != "/":
+                data_base += "/"
 
     output_levels = {"VERBOSE": 0, "DEBUG": 1, "INFO": 2,
                      "WARNING": 3, "ERROR": 4, "CRITICAL": 5}
@@ -94,11 +126,16 @@ def parse(cfg_file):
         assert isinstance(cfg["ml"]["exec"][exec_name]["bin"], str)
         assert isinstance(cfg["ml"]["exec"][exec_name]["type"], int)
 
-        config["ml"]["exec"][exec_name] = {"bin": cfg["ml"]["exec"][exec_name]["bin"],
+        config["ml"]["exec"][exec_name] = {"bin": resolve_path(bin_base, cfg["ml"]["exec"][exec_name]["bin"]),
                                            "type": cfg["ml"]["exec"][exec_name]["type"]}
 
+        if "decorator" in cfg["ml"]["exec"][exec_name]:
+            assert isinstance(cfg["ml"]["exec"][exec_name]["decorator"], str)
+            config["ml"]["exec"][exec_name]["decorator"] = getattr(decorator,
+                                                                   cfg["ml"]["exec"][exec_name]["decorator"])
+
     config["ml"]["route"] = list()
-    config["ml"]["route"] = depth_first_parser(cfg["ml"]["route"], config["ml"]["exec"])
+    config["ml"]["route"] = depth_first_parser(data_base, cfg["ml"]["route"], config["ml"]["exec"])
 
     return config
 

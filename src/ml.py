@@ -161,7 +161,7 @@ def depth_first_exec(post_id, output_prefix, route, is_tp, prev_output):
                          output_prefix])
         return  # Terminate this route
 
-    if route["endpoint"]:
+    if "succ" not in route:
         out_msg = "Post {} {}: {}".format(post_id,
                                           "classified" if is_tp is None else "learned",
                                           out_and_err[0].decode("utf-8").rstrip())
