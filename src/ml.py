@@ -108,7 +108,11 @@ def call(bin_with_args, stdin_bytes):
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
-    return proc.communicate(input=stdin_bytes)
+    result = proc.communicate(input=stdin_bytes)
+    if proc.returncode == 0:
+        return result
+    else:
+        return (result[0], ("(Exit code {}) ".format(proc.returncode) + result[1].decode("utf-8")).encode("utf-8"))
 
 
 def depth_first_exec(post_id, output_prefix, route, is_tp, prev_output):
