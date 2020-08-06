@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import json
+import decorator
 import verinfo
 
 
@@ -18,7 +19,6 @@ def depth_first_parser(data_base, route, exec_cfg):
     for node in route:
         parsed_node = dict()
         assert node["exec"] in exec_cfg
-
         parsed_node["exec"] = node["exec"]
 
         if exec_cfg[node["exec"]]["type"] in {1, 2}:  # Same format
